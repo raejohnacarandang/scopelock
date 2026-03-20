@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="canonical" href="https://scopelock-rei.netlify.app" />
+<meta name="description" content="ScopeLock stops scope creep before it derails your timeline. Lock scope, log change requests, enforce approvals, and generate invoices — all in one place. Free for freelancers and project managers." />
+<meta name="keywords" content="scope creep, project management, freelancer tool, change request, invoice generator, scope management" />
+<meta property="og:title" content="ScopeLock — Stop Scope Creep Before It Starts" />
+<meta property="og:description" content="Freelancers and project managers use ScopeLock to ship on time, get paid for every change, and end client disputes — without awkward conversations." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://scopelock-rei.netlify.app" />
+<meta property="og:image" content="https://scopelock-rei.netlify.app/og-image.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="ScopeLock — Stop Scope Creep Before It Starts" />
+<meta name="twitter:description" content="Freelancers and project managers use ScopeLock to ship on time, get paid for every change, and end client disputes." />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>" />
+<title>ScopeLock — Stop Scope Creep Before It Starts</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0F1523;
+    --surface: #1A2234;
+    --surface2: #242F45;
+    --surface3: #2E3A56;
+    --border: #374151;
+    --border-glow: #4B5563;
+    --text: #F3F4F6;
+    --muted: #9CA3AF;
+    --muted2: #6B7280;
+    --teal: #38BDF8;
+    --teal2: #0EA5E9;
+    --teal-glow: rgba(56,189,248,0.2);
+    --primary: #A78BFA;
+    --primary2: #8B5CF6;
+    --primary-glow: rgba(167,139,250,0.2);
+    --blue: #818CF8;
+    --green: #34D399;
+    --red: #F87171;
+    --orange: #FB923C;
+    --amber: #F59E0B;
+    --grad1: linear-gradient(135deg,#A78BFA,#38BDF8);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* Noise texture overlay */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.4;
+  }
+
+  * { position: relative; z-index: 1; }
+
+  /* === NAV === */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px; height: 62px;
+    background: rgba(15,21,35,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'IBM Plex Sans', sans-serif; font-weight: 800; font-size: 18px;
+    text-decoration: none; color: var(--text);
+  }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: var(--grad1);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+    box-shadow: 0 0 16px rgba(124,58,237,0.4);
+  }
+  .logo-text span { background: var(--grad1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .nav-links { display: flex; align-items: center; gap: 32px; }
+  .nav-links a {
+    color: var(--muted); font-size: 13px; text-decoration: none;
+    transition: color 0.2s; font-family: 'IBM Plex Mono', monospace;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta {
+    background: linear-gradient(135deg, var(--primary), var(--primary2));
+    color: #fff !important;
+    -webkit-text-fill-color: #fff;
+    border: none;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+    padding: 9px 22px; border-radius: 8px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 700;
+    letter-spacing: 0.05em; cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    box-shadow: 0 0 8px var(--primary-glow);
+  }
+  .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 2px 12px var(--primary-glow); }
+
+  /* === HERO === */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 140px 24px 100px;
+    position: relative; overflow: hidden;
+  }
+  /* Radial glow blobs */
+  .hero::before {
+    content: '';
+    position: absolute; top: -20%; left: 30%; 
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+  .hero::after {
+    content: '';
+    position: absolute; top: 10%; right: 20%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(0,245,212,0.07) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+  .hero-grid-bg {
+    position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background-image: 
+      linear-gradient(rgba(30,36,64,0.4) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30,36,64,0.4) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 0%, transparent 100%);
+  }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(0,245,212,0.06); border: 1px solid rgba(0,245,212,0.2);
+    color: var(--teal); font-size: 11px; letter-spacing: 0.1em;
+    padding: 7px 18px; border-radius: 100px; margin-bottom: 32px;
+    font-family: 'IBM Plex Mono', monospace;
+    animation: fadeUp 0.6s ease both;
+    box-shadow: 0 0 24px rgba(0,245,212,0.08);
+  }
+  .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); animation: pulse 2s ease infinite; }
+
+  h1.hero-title {
+    font-family: 'IBM Plex Sans', sans-serif; font-weight: 800;
+    font-size: clamp(40px, 7vw, 76px); line-height: 1.03;
+    letter-spacing: -0.04em; max-width: 860px;
+    animation: fadeUp 0.7s ease 0.1s both;
+    color: var(--text);
+  }
+  h1.hero-title em {
+    font-style: normal;
+    background: var(--grad1);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero-sub {
+    color: var(--muted2); font-size: 16px; max-width: 520px; margin: 28px auto 0;
+    line-height: 1.75; animation: fadeUp 0.7s ease 0.2s both;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+  .hero-actions {
+    display: flex; gap: 14px; margin-top: 44px; flex-wrap: wrap; justify-content: center;
+    animation: fadeUp 0.7s ease 0.3s both;
+  }
+  .btn-hero {
+    background: var(--grad1); color: #fff; border: none;
+    padding: 15px 36px; border-radius: 10px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 700;
+    letter-spacing: 0.04em; cursor: pointer; transition: all 0.2s;
+    text-decoration: none; display: inline-block;
+    box-shadow: 0 0 32px rgba(124,58,237,0.35);
+  }
+  .btn-hero:hover { transform: translateY(-2px); box-shadow: 0 8px 40px rgba(124,58,237,0.45); }
+  .btn-ghost {
+    background: rgba(255,255,255,0.04); color: var(--text);
+    border: 1px solid var(--border);
+    padding: 15px 36px; border-radius: 10px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+    cursor: pointer; transition: all 0.2s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-ghost:hover { border-color: var(--border-glow); background: rgba(255,255,255,0.07); }
+
+  /* Stats row */
+  .hero-stats {
+    display: flex; gap: 48px; margin-top: 64px; flex-wrap: wrap; justify-content: center;
+    animation: fadeUp 0.7s ease 0.4s both;
+    padding-top: 48px; border-top: 1px solid var(--border);
+    width: 100%; max-width: 680px;
+  }
+  .hero-stat { text-align: center; }
+  .hero-stat-num {
+    font-family: 'IBM Plex Sans', sans-serif; font-size: 32px; font-weight: 800;
+    background: var(--grad1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero-stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; font-family: 'IBM Plex Mono', monospace; }
+
+  /* === PROBLEM STRIP === */
+  .problem-strip {
+    background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    padding: 26px 48px;
+    display: flex; align-items: center; justify-content: center; gap: 40px;
+    flex-wrap: wrap;
+    overflow: hidden; position: relative;
+  }
+  .problem-strip::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--teal), transparent);
+    opacity: 0.4;
+  }
+  .ps-item { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; }
+  .ps-icon { font-size: 16px; }
+  .ps-item strong { color: var(--teal); font-weight: 700; }
+
+  /* === SECTIONS === */
+  section { padding: 110px 24px; }
+  .container { max-width: 980px; margin: 0 auto; }
+  .section-label {
+    font-size: 10px; letter-spacing: 0.18em; color: var(--teal);
+    text-transform: uppercase; margin-bottom: 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-label::before { content: '//'; color: var(--primary); }
+  .section-title {
+    font-family: 'IBM Plex Sans', sans-serif; font-weight: 800;
+    font-size: clamp(28px, 4vw, 44px); letter-spacing: -0.03em; line-height: 1.08; margin-bottom: 18px;
+  }
+  .section-sub { color: var(--muted2); font-size: 15px; max-width: 520px; line-height: 1.75; }
+
+  /* === PROBLEM CARDS === */
+  .problem-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin-top: 52px; }
+  .problem-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 26px; transition: border-color 0.2s, transform 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .problem-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--red), var(--orange));
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .problem-card:hover { border-color: rgba(241,65,108,0.3); transform: translateY(-2px); }
+  .problem-card:hover::before { opacity: 1; }
+  .problem-card .icon { font-size: 28px; margin-bottom: 16px; }
+  .problem-card h3 { font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 15px; margin-bottom: 10px; color: var(--text); }
+  .problem-card p { font-size: 13px; color: var(--muted2); line-height: 1.7; }
+
+  /* === HOW IT WORKS === */
+  .steps { display: grid; gap: 0; margin-top: 56px; }
+  .step {
+    display: grid; grid-template-columns: 56px 1fr;
+    gap: 24px; align-items: start;
+    padding: 32px 0; border-bottom: 1px solid var(--border);
+    transition: background 0.2s;
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    width: 44px; height: 44px; border-radius: 10px;
+    background: rgba(124,58,237,0.12); border: 1px solid rgba(124,58,237,0.3);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--primary2); font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 13px;
+    flex-shrink: 0;
+  }
+  .step h3 { font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 18px; margin-bottom: 8px; color: var(--text); }
+  .step p { font-size: 14px; color: var(--muted2); line-height: 1.75; }
+
+  /* === FEATURES === */
+  .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 14px; margin-top: 56px; }
+  .feature-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px; transition: all 0.2s; position: relative; overflow: hidden;
+  }
+  .feature-card::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+    background: var(--grad1); opacity: 0; transition: opacity 0.2s;
+  }
+  .feature-card:hover { border-color: var(--border-glow); transform: translateY(-3px); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+  .feature-card:hover::after { opacity: 1; }
+  .feature-card .feat-icon {
+    width: 42px; height: 42px; border-radius: 10px;
+    background: rgba(0,245,212,0.08); border: 1px solid rgba(0,245,212,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; margin-bottom: 16px;
+  }
+  .feature-card h3 { font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 16px; margin-bottom: 10px; color: var(--text); }
+  .feature-card p { font-size: 13px; color: var(--muted2); line-height: 1.7; }
+
+  /* === WHO IT'S FOR === */
+  .users-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-top: 52px; }
+  .user-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 22px; text-align: center; transition: all 0.2s;
+  }
+  .user-card:hover { border-color: rgba(0,245,212,0.3); box-shadow: 0 0 20px rgba(0,245,212,0.06); }
+  .user-card .uicon { font-size: 32px; margin-bottom: 12px; }
+  .user-card h4 { font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 13px; color: var(--text); }
+
+  /* === PRICING === */
+  .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-top: 56px; }
+  .price-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 32px 28px; transition: all 0.2s;
+  }
+  .price-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+  .price-card.featured {
+    border-color: var(--primary);
+    background: linear-gradient(145deg, rgba(124,58,237,0.08) 0%, var(--surface) 60%);
+    box-shadow: 0 0 40px rgba(124,58,237,0.15);
+    position: relative;
+  }
+  .price-badge {
+    position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+    background: var(--grad1); color: #fff; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.1em; padding: 4px 16px; border-radius: 100px;
+    white-space: nowrap; font-family: 'IBM Plex Mono', monospace;
+  }
+  .price-tier { font-size: 11px; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 12px; font-family: 'IBM Plex Mono', monospace; }
+  .price-amount { font-family: 'IBM Plex Sans', sans-serif; font-size: 46px; font-weight: 800; line-height: 1; color: var(--text); }
+  .price-amount sup { font-size: 20px; color: var(--muted2); vertical-align: super; }
+  .price-period { font-size: 12px; color: var(--muted); margin: 6px 0 24px; font-family: 'IBM Plex Mono', monospace; }
+  .price-features { list-style: none; display: grid; gap: 11px; margin-bottom: 28px; }
+  .price-features li { font-size: 13px; display: flex; gap: 10px; align-items: flex-start; color: var(--muted2); }
+  .price-features li::before { content: '✓'; color: var(--teal); flex-shrink: 0; font-weight: 700; }
+  .btn-price {
+    width: 100%; padding: 12px; border-radius: 8px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 700;
+    cursor: pointer; letter-spacing: 0.05em; transition: all 0.2s;
+    text-align: center; display: block; text-decoration: none;
+    border: 1px solid var(--border); background: transparent; color: var(--text);
+  }
+  .btn-price:hover { border-color: var(--border-glow); background: var(--surface2); }
+  .btn-price.highlight {
+    background: var(--grad1); color: #fff; border: none;
+    box-shadow: 0 0 24px rgba(124,58,237,0.3);
+  }
+  .btn-price.highlight:hover { box-shadow: 0 4px 32px rgba(124,58,237,0.5); transform: translateY(-1px); }
+
+  /* === SIGNUP === */
+  #signup {
+    background: var(--surface);
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  }
+  .signup-inner { max-width: 580px; margin: 0 auto; text-align: center; }
+  .signup-btn-row { display: flex; justify-content: center; margin-top: 36px; }
+  .btn-signup {
+    background: var(--grad1); color: #fff; border: none;
+    padding: 15px 40px; border-radius: 10px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    text-decoration: none; display: inline-block;
+    box-shadow: 0 0 28px rgba(124,58,237,0.3);
+  }
+  .btn-signup:hover { transform: translateY(-2px); box-shadow: 0 6px 36px rgba(124,58,237,0.45); }
+  .form-note { font-size: 12px; color: var(--muted); margin-top: 16px; font-family: 'IBM Plex Mono', monospace; }
+
+  /* === FEEDBACK === */
+  #feedback { background: var(--bg); border-top: 1px solid var(--border); }
+  .feedback-form {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 40px; max-width: 620px; margin: 52px auto 0;
+  }
+  .radio-group { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 12px 0 26px; }
+  .radio-btn {
+    aspect-ratio: 1; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--surface2); color: var(--muted2); font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .radio-btn:hover { border-color: rgba(0,245,212,0.4); color: var(--teal); }
+  .radio-btn.active { border-color: var(--teal); color: var(--teal); background: rgba(0,245,212,0.08); box-shadow: 0 0 14px rgba(0,245,212,0.1); }
+  .feedback-field { margin-bottom: 22px; }
+  .feedback-label { font-size: 10px; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; margin-bottom: 9px; font-family: 'IBM Plex Mono', monospace; }
+  .feedback-input, .feedback-textarea {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 16px; color: var(--text); font-family: 'IBM Plex Sans', sans-serif; font-size: 13px;
+    outline: none; transition: border-color 0.2s;
+  }
+  .feedback-input:focus, .feedback-textarea:focus { border-color: rgba(0,245,212,0.4); }
+  .feedback-textarea { min-height: 88px; resize: vertical; }
+  .success-msg {
+    display: none; text-align: center; padding: 28px;
+    color: var(--teal); font-size: 15px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 700;
+  }
+
+
+  /* === SOCIAL PROOF === */
+  .proof-section { background: var(--bg); border-top: 1px solid var(--border); }
+  .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 52px; }
+  .testimonial-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px; transition: all 0.2s; position: relative;
+  }
+  .testimonial-card:hover { border-color: rgba(0,245,212,0.25); transform: translateY(-2px); }
+  .testimonial-card::before {
+    content: '"';
+    position: absolute; top: 16px; right: 20px;
+    font-size: 64px; color: var(--primary); opacity: 0.15;
+    font-family: 'IBM Plex Sans', sans-serif; line-height: 1;
+  }
+  .testimonial-text { font-size: 14px; color: var(--muted2); line-height: 1.8; margin-bottom: 20px; font-style: italic; }
+  .testimonial-author { display: flex; align-items: center; gap: 12px; }
+  .author-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--grad1); display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .author-name { font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 13px; color: var(--text); }
+  .author-role { font-size: 11px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; margin-top: 2px; }
+  .proof-stats { display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; margin-top: 52px; padding-top: 40px; border-top: 1px solid var(--border); }
+  .proof-stat { text-align: center; }
+  .proof-stat-num { font-family: 'IBM Plex Sans', sans-serif; font-size: 36px; font-weight: 800; background: var(--grad1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .proof-stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; font-family: 'IBM Plex Mono', monospace; }
+  .early-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.2); color: var(--primary2); font-size: 10px; letter-spacing: 0.1em; padding: 4px 12px; border-radius: 100px; font-family: 'IBM Plex Mono', monospace; margin-bottom: 8px; }
+
+
+  /* === NAV ACTIVE STATE === */
+  .nav-links a.nav-active {
+    color: var(--teal) !important;
+  }
+  .nav-links a.nav-active::after {
+    content: '';
+    position: absolute; bottom: -4px; left: 0; right: 0; height: 1px;
+    background: var(--teal); border-radius: 1px;
+  }
+  /* === MOBILE NAV === */
+  .hamburger {
+    display: none; flex-direction: column; gap: 5px; cursor: pointer;
+    background: none; border: none; padding: 4px;
+  }
+  .hamburger span {
+    display: block; width: 22px; height: 2px;
+    background: var(--text); border-radius: 2px; transition: all 0.3s;
+  }
+  .mobile-nav-overlay {
+    display: none; position: fixed; inset: 0; z-index: 99;
+    background: rgba(8,11,24,0.97); backdrop-filter: blur(20px);
+    flex-direction: column; align-items: center; justify-content: center; gap: 32px;
+  }
+  .mobile-nav-overlay.open { display: flex; }
+  .mobile-nav-overlay a {
+    color: var(--text); font-size: 22px; text-decoration: none;
+    font-family: 'IBM Plex Sans', sans-serif; font-weight: 700;
+    transition: color 0.2s;
+  }
+  .mobile-nav-overlay a:hover { color: var(--teal); }
+  .mobile-nav-close {
+    position: absolute; top: 24px; right: 24px;
+    background: none; border: none; color: var(--muted); font-size: 28px; cursor: pointer;
+  }
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+    .feedback-form { padding: 24px 16px; }
+    .hero-actions { flex-direction: column; align-items: center; }
+    .hero-actions a { width: 100%; text-align: center; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .proof-stats { gap: 24px; }
+  }
+
+
+  /* === BACK TO TOP === */
+  .back-to-top {
+    position: fixed; bottom: 28px; right: 28px; z-index: 200;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--grad1); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+    opacity: 0; transform: translateY(16px);
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+  }
+  .back-to-top.visible { opacity: 1; transform: translateY(0); pointer-events: all; }
+  .back-to-top:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(124,58,237,0.55); }
+  /* === FOOTER === */
+  footer {
+    border-top: 1px solid var(--border); padding: 36px 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+    background: var(--surface);
+  }
+  footer p { font-size: 12px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; }
+
+  /* === ANIMATIONS === */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,245,212,0.5); }
+    50% { opacity: 0.8; box-shadow: 0 0 0 5px rgba(0,245,212,0); }
+  }
+
+  .reveal {
+    opacity: 0; transform: translateY(22px);
+    transition: opacity 0.65s ease, transform 0.65s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--surface); }
+  ::-webkit-scrollbar-thumb { background: var(--border-glow); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 640px) {
+    nav { padding: 0 20px; }
+    .nav-links a:not(:last-child) { display: none; }
+    .problem-strip { gap: 18px; padding: 20px; }
+    section { padding: 70px 20px; }
+    .hero-stats { gap: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">
+    <div class="logo-icon">🔒</div>
+    <span class="logo-text">Scope<span>Lock</span></span>
+  </a>
+  <div class="nav-links">
+    <a href="#how-it-works">How it works</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#feedback">Feedback</a>
+    <a href="app.html" class="nav-cta">Try the App →</a>
+  </div>
+  <button class="hamburger" onclick="toggleMobileNav()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- MOBILE NAV OVERLAY -->
+<div class="mobile-nav-overlay" id="mobileNav">
+  <button class="mobile-nav-close" onclick="toggleMobileNav()">✕</button>
+  <a href="#how-it-works" onclick="toggleMobileNav()">How it works</a>
+  <a href="#pricing" onclick="toggleMobileNav()">Pricing</a>
+  <a href="#feedback" onclick="toggleMobileNav()">Feedback</a>
+  <a href="app.html" class="nav-cta" style="font-size:16px;padding:14px 32px;">Try the App →</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="badge"><span class="badge-dot"></span>Now in Early Access — Free to Try</div>
+  <h1 class="hero-title">Your project scope is<br/><em>silently drifting.</em></h1>
+  <p class="hero-sub">Freelancers and project managers use ScopeLock to ship on time, get paid for every change, and end client disputes — without awkward conversations.</p>
+  <div class="hero-actions">
+    <a href="app.html" class="btn-hero">🔒 Create Your Free Account →</a>
+    <a href="#how-it-works" class="btn-ghost">See How It Works</a>
+  </div>
+</section>
+
+<!-- PROBLEM STRIP -->
+<div class="problem-strip">
+  <div class="ps-item"><span class="ps-icon">💸</span><span><strong>50%</strong> of projects go over budget</span></div>
+  <div class="ps-item"><span class="ps-icon">⏱️</span><span><strong>70%</strong> of scope changes come from informal chat</span></div>
+  <div class="ps-item"><span class="ps-icon">🔥</span><span><strong>#1 cause</strong> of freelancer burnout</span></div>
+  <div class="ps-item"><span class="ps-icon">📉</span><span><strong>No tool</strong> enforces scope boundaries</span></div>
+</div>
+
+<!-- PROBLEM SECTION -->
+<section>
+  <div class="container">
+    <div class="section-label reveal">The Problem</div>
+    <h2 class="section-title reveal">Your tools track tasks.<br/>None of them guard your scope.</h2>
+    <p class="section-sub reveal">Jira. ClickUp. Trello. Great for tracking tasks. But clients and teammates add new work through Slack and email — and your timeline quietly breaks.</p>
+    <div class="problem-grid">
+      <div class="problem-card reveal">
+        <div class="icon">💬</div>
+        <h3>The Slack Change</h3>
+        <p>"Hey can we just add one more thing?" — A casual message that costs you 3 days. No record. No approval. No accountability.</p>
+      </div>
+      <div class="problem-card reveal">
+        <div class="icon">📧</div>
+        <h3>The Email Assumption</h3>
+        <p>Client replied to an email thinking it was approved. You missed it. Now it's 2 weeks before launch and the feature doesn't exist.</p>
+      </div>
+      <div class="problem-card reveal">
+        <div class="icon">😤</div>
+        <h3>The Dispute</h3>
+        <p>"We agreed this was included." No you didn't. But you have no proof. The client is angry, you're exhausted, and the project is late.</p>
+      </div>
+      <div class="problem-card reveal">
+        <div class="icon">📉</div>
+        <h3>The Silent Overrun</h3>
+        <p>By the time you notice scope drift, you've already absorbed the cost. The project that was 4 weeks somehow took 8.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works" style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+  <div class="container">
+    <div class="section-label reveal">How ScopeLock Works</div>
+    <h2 class="section-title reveal">Three steps to scope certainty.</h2>
+    <p class="section-sub reveal">Designed for freelancers, small teams, and agencies. No onboarding call. Start in under 5 minutes.</p>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-num">01</div>
+        <div>
+          <h3>🔒 Lock the Scope Baseline</h3>
+          <p>Write what's included in the project — and explicitly what's NOT. Once locked, it becomes a permanent record. Every stakeholder knows exactly what was agreed, and when.</p>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">02</div>
+        <div>
+          <h3>📋 Log Every Change Request</h3>
+          <p>When a client wants to add, remove, or change something, you submit a formal Change Request with description, estimated hours, and additional charge. Nothing gets done from a Slack message ever again.</p>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">03</div>
+        <div>
+          <h3>✅ Approve or Reject — With Full Audit Trail</h3>
+          <p>You approve or reject each change — with an optional rejection reason visible to the client. Every decision is timestamped and recorded forever in the audit log.</p>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">04</div>
+        <div>
+          <h3>📊 Watch Your Scope Drift Dashboard</h3>
+          <p>At any moment, see how much work has deviated from the original scope. Generate an invoice from approved changes in one click — with actual hours and charges, not guesses.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section>
+  <div class="container">
+    <div class="section-label reveal">Features</div>
+    <h2 class="section-title reveal">Everything you need.<br/>Nothing you don't.</h2>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feat-icon">🔒</div>
+        <h3>Scope Baseline Snapshot</h3>
+        <p>Write the project scope once. Lock it. It becomes a permanent, tamper-proof record that everyone can reference at any time.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feat-icon">📋</div>
+        <h3>Change Request Ledger</h3>
+        <p>Every proposed change is formally logged with description, requester, estimated hours, additional charge, and impact level.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feat-icon">✅</div>
+        <h3>Approval Workflow + Rejection Reasons</h3>
+        <p>Approve or reject with one click. Rejection reasons are recorded and visible to clients — no more "we never discussed this."</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feat-icon">📊</div>
+        <h3>Scope Drift Indicator</h3>
+        <p>A live visual showing how much your project has deviated from the original scope — so you're never blindsided.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feat-icon">🧾</div>
+        <h3>Invoice Generator</h3>
+        <p>Generate a professional invoice from all approved changes. Uses actual hours and charges you entered — not guesses based on impact labels.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feat-icon">🔗</div>
+        <h3>Client Share Links</h3>
+        <p>Send clients a read-only link to view scope, see all CRs, and leave comments per change request — no account needed.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO IT'S FOR -->
+<section style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+  <div class="container" style="text-align:center;">
+    <div class="section-label reveal" style="justify-content:center;">Who It's For</div>
+    <h2 class="section-title reveal">Built for the builders<br/>tired of scope surprises.</h2>
+    <div class="users-grid">
+      <div class="user-card reveal"><div class="uicon">💻</div><h4>Freelancers</h4></div>
+      <div class="user-card reveal"><div class="uicon">🏢</div><h4>Dev Agencies</h4></div>
+      <div class="user-card reveal"><div class="uicon">🚀</div><h4>Startups</h4></div>
+      <div class="user-card reveal"><div class="uicon">📐</div><h4>Design Studios</h4></div>
+      <div class="user-card reveal"><div class="uicon">🛠️</div><h4>Internal Teams</h4></div>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL PROOF -->
+<section class="proof-section">
+  <div class="container">
+    <div class="section-label reveal" style="justify-content:center;">Early Feedback</div>
+    <h2 class="section-title reveal" style="text-align:center;">What early testers are saying.</h2>
+    <p class="section-sub reveal" style="margin:0 auto;text-align:center;">Real feedback from freelancers and developers who tried ScopeLock during beta.</p>
+    <div class="testimonials-grid">
+
+      <div class="testimonial-card reveal">
+        <div class="early-badge">✦ Beta Tester</div>
+        <p class="testimonial-text">"I've been freelancing for 3 years and scope creep has always been my biggest headache. ScopeLock is the first tool that actually makes it easy to say no — with proof to back it up."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">💻</div>
+          <div>
+            <div class="author-name">Web Developer</div>
+            <div class="author-role">Freelancer · Beta Tester</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card reveal">
+        <div class="early-badge">✦ Beta Tester</div>
+        <p class="testimonial-text">"The client share link is a game changer. My client can see exactly what was agreed and what changed — no more 'I thought this was included' conversations."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">🏢</div>
+          <div>
+            <div class="author-name">Project Manager</div>
+            <div class="author-role">Dev Agency · Beta Tester</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card reveal">
+        <div class="early-badge">✦ Beta Tester</div>
+        <p class="testimonial-text">"The invoice generator alone is worth it. Before ScopeLock I was manually computing extra charges. Now it pulls everything automatically from approved CRs."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">📐</div>
+          <div>
+            <div class="author-name">UI/UX Designer</div>
+            <div class="author-role">Design Studio · Beta Tester</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="proof-stats reveal">
+      <div class="proof-stat">
+        <div class="proof-stat-num">5 min</div>
+        <div class="proof-stat-label">avg. time to first project</div>
+      </div>
+      <div class="proof-stat">
+        <div class="proof-stat-num">100%</div>
+        <div class="proof-stat-label">of testers would try again</div>
+      </div>
+      <div class="proof-stat">
+        <div class="proof-stat-num">Free</div>
+        <div class="proof-stat-label">no credit card required</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="container">
+    <div class="section-label reveal">Pricing</div>
+    <h2 class="section-title reveal">Simple, honest pricing.</h2>
+    <p class="section-sub reveal">No per-seat confusion. No feature gating on what you actually need. Pay for projects, not people.</p>
+    <div class="pricing-grid">
+      <div class="price-card reveal">
+        <div class="price-tier">Free</div>
+        <div class="price-amount">$0</div>
+        <div class="price-period">forever</div>
+        <ul class="price-features">
+          <li>1 Active Project</li>
+          <li>Unlimited Change Requests</li>
+          <li>Approve / Reject Workflow</li>
+          <li>Scope Drift Dashboard</li>
+        </ul>
+        <a href="app.html" class="btn-price">Start Free — No Card Needed</a>
+      </div>
+      <div class="price-card featured reveal">
+        <div class="price-badge">MOST POPULAR</div>
+        <div class="price-tier">Pro</div>
+        <div class="price-amount"><sup>$</sup>9</div>
+        <div class="price-period">per month</div>
+        <ul class="price-features">
+          <li>Up to 5 Active Projects</li>
+          <li>All Free features</li>
+          <li>Client Share Links</li>
+          <li>Invoice Generator</li>
+          <li>PDF &amp; CSV Export</li>
+          <li>Email Notifications</li>
+        </ul>
+        <a href="app.html" class="btn-price highlight">Get Early Access — Try Free</a>
+      </div>
+      <div class="price-card reveal">
+        <div class="price-tier">Business</div>
+        <div class="price-amount"><sup>$</sup>19</div>
+        <div class="price-period">per month</div>
+        <ul class="price-features">
+          <li>Unlimited Projects</li>
+          <li>All Pro features</li>
+          <li>Team Admin Dashboard</li>
+          <li>Priority Support</li>
+          <li>API Access</li>
+        </ul>
+        <a href="app.html" class="btn-price">Get Early Access — Try Free</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SIGNUP -->
+<section id="signup">
+  <div class="signup-inner">
+    <div class="section-label reveal" style="justify-content:center;">Early Access</div>
+    <h2 class="section-title reveal" style="text-align:center;">Stop scope creep today.<br/>It's free to start.</h2>
+    <p class="section-sub reveal" style="margin:0 auto;text-align:center;">Early users get Pro free for 3 months. No credit card. No spam.</p>
+    <div class="signup-btn-row reveal">
+      <a href="app.html" class="btn-signup">🔒 Create Your Free Account →</a>
+    </div>
+    <div class="form-note reveal">No credit card · No spam · Cancel anytime</div>
+  </div>
+</section>
+
+<!-- FEEDBACK SECTION -->
+<section id="feedback">
+  <div class="container">
+    <div class="section-label reveal" style="justify-content:center;">Beta Feedback</div>
+    <h2 class="section-title reveal" style="text-align:center;">Tried the app?<br/>Tell us what you think.</h2>
+    <p class="section-sub reveal" style="margin:0 auto;text-align:center;">Your feedback directly shapes ScopeLock. We read every single response.</p>
+    <div class="feedback-form reveal">
+      <div id="feedbackFormInner">
+        <div class="feedback-field">
+          <div class="feedback-label">Your Name <span style="color:var(--muted);font-size:10px;">(optional)</span></div>
+          <input class="feedback-input" id="fbName" type="text" placeholder="e.g. Juan dela Cruz" />
+        </div>
+        <div class="feedback-field">
+          <div class="feedback-label">Your Role</div>
+          <input class="feedback-input" id="fbRole" type="text" placeholder="e.g. Freelancer, Developer, Project Manager..." />
+        </div>
+        <div class="feedback-field">
+          <div class="feedback-label">How likely are you to use ScopeLock on a real project? (1–5)</div>
+          <div class="radio-group" id="ratingGroup">
+            <button class="radio-btn" onclick="selectRating(this,1)">1</button>
+            <button class="radio-btn" onclick="selectRating(this,2)">2</button>
+            <button class="radio-btn" onclick="selectRating(this,3)">3</button>
+            <button class="radio-btn" onclick="selectRating(this,4)">4</button>
+            <button class="radio-btn" onclick="selectRating(this,5)">5</button>
+          </div>
+        </div>
+        <div class="feedback-field">
+          <div class="feedback-label">What did you like about ScopeLock?</div>
+          <textarea class="feedback-textarea" id="fbLiked" placeholder="Tell us what felt useful or clear..."></textarea>
+        </div>
+        <div class="feedback-field">
+          <div class="feedback-label">What confused you or didn't work well?</div>
+          <textarea class="feedback-textarea" id="fbConfused" placeholder="Anything that felt clunky, missing, or unclear..."></textarea>
+        </div>
+        <div class="feedback-field">
+          <div class="feedback-label">What feature do you wish existed?</div>
+          <textarea class="feedback-textarea" id="fbWish" placeholder="Dream feature you'd love to see..."></textarea>
+        </div>
+        <div class="feedback-field">
+          <div class="feedback-label">Would you use it again?</div>
+          <input class="feedback-input" id="fbAgain" type="text" placeholder="Yes / Maybe / No — and why" />
+        </div>
+        <button class="btn-signup" style="width:100%;padding:14px;font-size:13px;border-radius:10px;" onclick="submitFeedback()">
+          Submit Feedback →
+        </button>
+      </div>
+      <div class="success-msg" id="feedbackSuccess">
+        🙏 Thank you! This is exactly what helps us build something people actually want.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#" class="logo" style="font-size:15px;text-decoration:none;">
+    <div class="logo-icon" style="width:26px;height:26px;font-size:13px;">🔒</div>
+    <span class="logo-text">Scope<span>Lock</span></span>
+  </a>
+  <p>Lock scope. Track changes. Ship on time. · Built by Raejohn Carandang</p>
+  <div style="display:flex;gap:20px;flex-wrap:wrap;">
+    <a href="#how-it-works" style="font-size:12px;color:var(--muted);text-decoration:none;font-family:'IBM Plex Mono',monospace;">How it works</a>
+    <a href="#pricing" style="font-size:12px;color:var(--muted);text-decoration:none;font-family:'IBM Plex Mono',monospace;">Pricing</a>
+    <a href="#feedback" style="font-size:12px;color:var(--muted);text-decoration:none;font-family:'IBM Plex Mono',monospace;">Feedback</a>
+    <a href="app.html" style="font-size:12px;color:var(--teal);text-decoration:none;font-family:'IBM Plex Mono',monospace;">Try the App →</a>
+  </div>
+  <p>© 2026 ScopeLock · Early Access</p>
+</footer>
+
+<script>
+
+  // Back to top
+  window.addEventListener('scroll', () => {
+    const backToTop = document.getElementById('backToTop');
+    if (!backToTop) return;
+    if (window.scrollY > 400) backToTop.classList.add('visible');
+    else backToTop.classList.remove('visible');
+  });
+
+
+  // Nav active state on scroll
+  const sections = ['how-it-works', 'pricing', 'feedback'];
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navLinks.forEach(a => a.classList.remove('nav-active'));
+        const active = document.querySelector(`.nav-links a[href="#${e.target.id}"]`);
+        if (active) active.classList.add('nav-active');
+      }
+    });
+  }, { threshold: 0.4 });
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) sectionObserver.observe(el);
+  });
+
+  // Mobile nav
+  function toggleMobileNav() {
+    document.getElementById('mobileNav').classList.toggle('open');
+  }
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(r => observer.observe(r));
+
+  // Rating
+  let selectedRating = 0;
+  function selectRating(btn, val) {
+    selectedRating = val;
+    document.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  // Supabase config
+  const SUPABASE_URL = "https://vbsvcduprffogqtvsvoy.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_gRAd31DnAypQ9X5iP_na2Q_qd9nCXzI";
+
+  // Feedback submit
+  async function submitFeedback() {
+    const role = document.getElementById('fbRole').value.trim();
+    const liked = document.getElementById('fbLiked').value.trim();
+    const confused = document.getElementById('fbConfused').value.trim();
+    const wish = document.getElementById('fbWish').value.trim();
+    const again = document.getElementById('fbAgain').value.trim();
+
+    if (!role || !liked) {
+      alert('Please fill in at least your role and what you liked.');
+      return;
+    }
+
+    const btn = document.querySelector('#feedbackFormInner .btn-signup');
+    btn.textContent = 'Submitting...';
+    btn.disabled = true;
+
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/feedback`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+          name: document.getElementById('fbName').value.trim() || null,
+          role,
+          rating: selectedRating || null,
+          liked,
+          confused,
+          wished_feature: wish,
+          would_use_again: again
+        })
+      });
+
+      if (res.ok || res.status === 201) {
+        document.getElementById('feedbackFormInner').style.display = 'none';
+        document.getElementById('feedbackSuccess').style.display = 'block';
+      } else {
+        const err = await res.text();
+        console.error('Supabase error:', err);
+        alert('Something went wrong. Please try again.');
+        btn.textContent = 'Submit Feedback →';
+        btn.disabled = false;
+      }
+    } catch (e) {
+      console.error('Network error:', e);
+      alert('Network error. Please try again.');
+      btn.textContent = 'Submit Feedback →';
+      btn.disabled = false;
+    }
+  }
+</script>
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">↑</button>
+</body>
+</html>

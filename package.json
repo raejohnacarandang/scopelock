@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@capacitor/cli": "^8.2.0",
+    "@capacitor/core": "^8.2.0"
+  },
+  "devDependencies": {
+    "electron": "^41.0.3"
+  }
+}
