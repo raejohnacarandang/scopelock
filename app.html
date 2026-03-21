@@ -2961,6 +2961,7 @@ function AuthScreen({onAuth, onDemo}){
   const [loading,setLoading]=useState(false);
   const [googleLoading,setGoogleLoading]=useState(false);
   const [suMsg,setSuMsg]=useState("");
+  const [showPassword,setShowPassword]=useState(false);
 
   async function handleSubmit(){
     const errs={};
@@ -3040,10 +3041,15 @@ function AuthScreen({onAuth, onDemo}){
             </div>
             <div>
               <div className="lbl">Password</div>
-              <input type="password" placeholder="Min 6 characters" value={form.password}
-                onChange={e=>setForm(f=>({...f,password:e.target.value}))}
-                onKeyDown={e=>e.key==="Enter"&&handleSubmit()}
-                style={{border:`1px solid ${errors.password?"#F1416C":"var(--border)"}`}}/>
+              <div style={{position:"relative",display:"flex",alignItems:"center"}}>
+                <input type={showPassword?"text":"password"} placeholder="Min 6 characters" value={form.password}
+                  onChange={e=>setForm(f=>({...f,password:e.target.value}))}
+                  onKeyDown={e=>e.key==="Enter"&&handleSubmit()}
+                  style={{border:`1px solid ${errors.password?"#F1416C":"var(--border)"}`,paddingRight:42,flex:1}}/>
+                <button type="button" onClick={()=>setShowPassword(v=>!v)} onMouseDown={e=>e.preventDefault()} style={{position:"absolute",right:10,background:"none",border:"none",cursor:"pointer",color:"var(--muted)",fontSize:16,padding:4,display:"flex",alignItems:"center",justifyContent:"center",transition:"color 0.12s"}} title={showPassword?"Hide password":"Show password"}>
+                  {showPassword?"👁️":"👁️‍🗨️"}
+                </button>
+              </div>
               {errors.password&&<div style={{fontSize:11,color:"#F1416C",marginTop:4}}>{errors.password}</div>}
             </div>
           </div>
