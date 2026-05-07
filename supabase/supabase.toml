@@ -7,6 +7,7 @@
   payhip_webhook = { verify_jwt = false }
   check_subscription_expiry = { verify_jwt = false }
   grant_subscription = { verify_jwt = false }
+  start_trial = { verify_jwt = false }
 
 [project]
   project_id = "vbsvcduprffogqtvsvoy"
