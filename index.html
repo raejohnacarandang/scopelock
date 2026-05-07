@@ -77,17 +77,17 @@
   }
   .logo {
     display: flex; align-items: center; gap: 10px;
-    font-family: 'IBM Plex Sans', sans-serif; font-weight: 800; font-size: 18px;
+    font-family: 'IBM Plex Sans', sans-serif; font-weight: 800;
     text-decoration: none; color: var(--text);
   }
   .logo-icon {
     width: 32px; height: 32px;
-    background: var(--grad1);
+    background: linear-gradient(135deg,#7C3AED,#0EA5E9);
     border-radius: 8px;
-    display: flex; align-items: center; justify-content: center; font-size: 16px;
-    box-shadow: 0 0 16px rgba(124,58,237,0.4);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 12px rgba(124,58,237,0.35);
   }
-  .logo-text span { background: var(--grad1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .logo-text span { background: linear-gradient(135deg,#7C3AED,#0EA5E9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .nav-links { display: flex; align-items: center; gap: 32px; }
   .nav-links a {
     color: var(--muted); font-size: 13px; text-decoration: none;
@@ -109,94 +109,76 @@
   }
   .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 2px 12px var(--primary-glow); }
 
-  /* === HERO === */
+  /* === HERO - Simplified === */
   .hero {
-    min-height: 100vh;
+    min-height: 90vh;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    text-align: center; padding: 140px 24px 100px;
-    position: relative; overflow: hidden;
+    text-align: center; padding: 100px 20px 60px;
+    position: relative;
+    overflow: hidden;
   }
-  /* Radial glow blobs */
   .hero::before {
     content: '';
-    position: absolute; top: -20%; left: 30%; 
-    width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%);
-    pointer-events: none; z-index: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 60%;
+    background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(124,58,237,0.15), transparent);
+    pointer-events: none;
   }
-  .hero::after {
-    content: '';
-    position: absolute; top: 10%; right: 20%;
-    width: 400px; height: 400px;
-    background: radial-gradient(circle, rgba(0,245,212,0.07) 0%, transparent 70%);
-    pointer-events: none; z-index: 0;
-  }
-  .hero-grid-bg {
-    position: absolute; inset: 0; z-index: 0; pointer-events: none;
-    background-image: 
-      linear-gradient(rgba(30,36,64,0.4) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(30,36,64,0.4) 1px, transparent 1px);
-    background-size: 40px 40px;
-    mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 0%, transparent 100%);
-  }
-
   .badge {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: rgba(0,245,212,0.06); border: 1px solid rgba(0,245,212,0.2);
-    color: var(--teal); font-size: 11px; letter-spacing: 0.1em;
-    padding: 7px 18px; border-radius: 100px; margin-bottom: 32px;
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(124,58,237,0.12); border: 1px solid rgba(124,58,237,0.3);
+    color: #a78bfa; font-size: 11px; letter-spacing: 0.08em;
+    padding: 4px 14px; border-radius: 999px; margin-bottom: 24px;
     font-family: 'IBM Plex Mono', monospace;
-    animation: fadeUp 0.6s ease both;
-    box-shadow: 0 0 24px rgba(0,245,212,0.08);
   }
-  .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); animation: pulse 2s ease infinite; }
-
+  .badge-dot { width: 5px; height: 5px; border-radius: 50%; background: #a78bfa; animation: pulse 2s ease infinite; }
+  
   h1.hero-title {
     font-family: 'IBM Plex Sans', sans-serif; font-weight: 800;
-    font-size: clamp(40px, 7vw, 76px); line-height: 1.03;
-    letter-spacing: -0.04em; max-width: 860px;
-    animation: fadeUp 0.7s ease 0.1s both;
+    font-size: clamp(32px, 6vw, 52px); line-height: 1.1;
+    letter-spacing: -0.03em; max-width: 700px;
     color: var(--text);
-  }
-  h1.hero-title em {
-    font-style: normal;
-    background: var(--grad1);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    position: relative;
   }
   .hero-sub {
-    color: var(--muted2); font-size: 16px; max-width: 520px; margin: 28px auto 0;
-    line-height: 1.75; animation: fadeUp 0.7s ease 0.2s both;
-    font-family: 'IBM Plex Sans', sans-serif;
+    color: rgba(255,255,255,0.6); font-size: 14px; max-width: 420px; margin: 18px auto 0;
+    line-height: 1.7;
   }
   .hero-actions {
-    display: flex; gap: 14px; margin-top: 44px; flex-wrap: wrap; justify-content: center;
-    animation: fadeUp 0.7s ease 0.3s both;
+    display: flex; gap: 10px; margin-top: 28px; flex-wrap: wrap; justify-content: center;
+    max-height: 60px;
   }
+  .mockup-carousel { position: relative; width: 100%; max-width: 800px; margin: 40px auto 0; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 32px 80px rgba(0,0,0,0.4); background: rgba(255,255,255,0.02); }
+  .mockup-track { display: flex; width: 200%; transition: transform 0.6s cubic-bezier(0.4,0,0.2,1); }
+  .mockup-slide { width: 50%; flex-shrink: 0; }
+  .mockup-slide img { width: 100%; height: auto; display: block; }
+  .mockup-carousel::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 120px; background: linear-gradient(to bottom, transparent, #0f0f1a); pointer-events: none; z-index: 2; }
+  .mockup-dots { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; z-index: 3; }
+  .mockup-dots .dot { width: 6px; height: 6px; border-radius: 999px; background: rgba(255,255,255,0.2); transition: all 0.3s ease; cursor: pointer; }
+  .mockup-dots .dot.active { width: 20px; background: #7c3aed; }
   .btn-hero {
     background: var(--grad1); color: #fff; border: none;
-    padding: 15px 36px; border-radius: 10px;
-    font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 700;
+    padding: 12px 24px; border-radius: 8px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 700;
     letter-spacing: 0.04em; cursor: pointer; transition: all 0.2s;
     text-decoration: none; display: inline-block;
-    box-shadow: 0 0 32px rgba(124,58,237,0.35);
   }
-  .btn-hero:hover { transform: translateY(-2px); box-shadow: 0 8px 40px rgba(124,58,237,0.45); }
+  .btn-hero:hover { transform: translateY(-2px); }
   .btn-ghost {
     background: rgba(255,255,255,0.04); color: var(--text);
     border: 1px solid var(--border);
-    padding: 15px 36px; border-radius: 10px;
-    font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+    padding: 12px 24px; border-radius: 8px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
     cursor: pointer; transition: all 0.2s;
     text-decoration: none; display: inline-block;
   }
   .btn-ghost:hover { border-color: var(--border-glow); background: rgba(255,255,255,0.07); }
 
-  /* Stats row */
+  /* === HERO STATS - Hidden, available on scroll === */
   .hero-stats {
-    display: flex; gap: 48px; margin-top: 64px; flex-wrap: wrap; justify-content: center;
-    animation: fadeUp 0.7s ease 0.4s both;
-    padding-top: 48px; border-top: 1px solid var(--border);
-    width: 100%; max-width: 680px;
+    display: none; /* Hidden by default, shown via JS on scroll */
   }
   .hero-stat { text-align: center; }
   .hero-stat-num {
@@ -205,227 +187,234 @@
   }
   .hero-stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; font-family: 'IBM Plex Mono', monospace; }
 
-  /* === PROBLEM STRIP === */
+  /* === PROBLEM STRIP - Simplified === */
   .problem-strip {
-    background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
-    padding: 26px 48px;
-    display: flex; align-items: center; justify-content: center; gap: 40px;
+    background: rgba(255,255,255,0.04); border-top: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 14px 24px;
+    display: flex; align-items: center; justify-content: center; gap: 24px;
     flex-wrap: wrap;
-    overflow: hidden; position: relative;
   }
-  .problem-strip::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, var(--teal), transparent);
-    opacity: 0.4;
-  }
-  .ps-item { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; }
-  .ps-icon { font-size: 16px; }
-  .ps-item strong { color: var(--teal); font-weight: 700; }
+  .ps-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; }
+  .ps-icon { font-size: 14px; opacity: 0.5; }
+  .ps-item strong { color: #a78bfa; font-weight: 700; }
+  .ps-dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,0.2); }
 
-  /* === SECTIONS === */
-  section { padding: 110px 24px; }
-  .container { max-width: 980px; margin: 0 auto; }
+  /* === SECTIONS - Simplified spacing === */
+  section { padding: 64px 24px; }
+  .container { max-width: 840px; margin: 0 auto; }
   .section-label {
-    font-size: 10px; letter-spacing: 0.18em; color: var(--teal);
-    text-transform: uppercase; margin-bottom: 16px;
+    font-size: 11px; letter-spacing: 0.12em; color: rgba(255,255,255,0.4);
+    text-transform: uppercase; margin-bottom: 12px;
     font-family: 'IBM Plex Mono', monospace;
     display: flex; align-items: center; gap: 10px;
   }
-  .section-label::before { content: '//'; color: var(--primary); }
+  .section-label::before { content: '//'; color: #7c3aed; font-weight: 700; }
   .section-title {
-    font-family: 'IBM Plex Sans', sans-serif; font-weight: 800;
-    font-size: clamp(28px, 4vw, 44px); letter-spacing: -0.03em; line-height: 1.08; margin-bottom: 18px;
+    font-family: 'IBM Plex Sans', sans-serif; font-weight: 700;
+    font-size: clamp(24px, 4vw, 36px); letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 40px;
   }
-  .section-sub { color: var(--muted2); font-size: 15px; max-width: 520px; line-height: 1.75; }
+  .section-sub { color: var(--muted2); font-size: 14px; max-width: 480px; line-height: 1.7; }
 
-  /* === PROBLEM CARDS === */
-  .problem-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin-top: 52px; }
+  /* === PROBLEM CARDS - Simplified grid === */
+  .problem-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 32px; }
   .problem-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-    padding: 26px; transition: border-color 0.2s, transform 0.2s;
-    position: relative; overflow: hidden;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 20px; transition: all 0.2s;
+    border-left: 3px solid rgba(239,68,68,0.4);
   }
-  .problem-card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, var(--red), var(--orange));
-    opacity: 0;
-    transition: opacity 0.2s;
+  .problem-card:hover { border-color: rgba(239,68,68,0.3); border-left-color: rgba(239,68,68,0.6); background: rgba(239,68,68,0.04); transform: translateY(-2px); }
+  .problem-card .icon { 
+    width: 36px; height: 36px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;
+    color: #f87171; font-size: 16px;
   }
-  .problem-card:hover { border-color: rgba(241,65,108,0.3); transform: translateY(-2px); }
-  .problem-card:hover::before { opacity: 1; }
-  .problem-card .icon { font-size: 28px; margin-bottom: 16px; }
-  .problem-card h3 { font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 15px; margin-bottom: 10px; color: var(--text); }
-  .problem-card p { font-size: 13px; color: var(--muted2); line-height: 1.7; }
+  .problem-card h3 { font-family: 'IBM Plex Sans', sans-serif; font-weight: 600; font-size: 15px; margin-bottom: 8px; color: var(--text); }
+  .problem-card p { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.6; }
 
-  /* === HOW IT WORKS === */
-  .steps { display: grid; gap: 0; margin-top: 56px; }
+  /* === HOW IT WORKS - Simplified === */
+  .steps { display: grid; gap: 0; margin-top: 32px; position: relative; }
+  .steps::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    width: 2px;
+    height: calc(100% - 40px);
+    top: 40px;
+    background: linear-gradient(to bottom, #7c3aed, rgba(124,58,237,0.1));
+  }
   .step {
-    display: grid; grid-template-columns: 56px 1fr;
-    gap: 24px; align-items: start;
-    padding: 32px 0; border-bottom: 1px solid var(--border);
-    transition: background 0.2s;
+    display: grid; grid-template-columns: 44px 1fr;
+    gap: 16px; align-items: start;
+    padding: 20px 0; border-bottom: 1px solid var(--border);
   }
   .step:last-child { border-bottom: none; }
   .step-num {
-    width: 44px; height: 44px; border-radius: 10px;
-    background: rgba(124,58,237,0.12); border: 1px solid rgba(124,58,237,0.3);
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
     display: flex; align-items: center; justify-content: center;
-    color: var(--primary2); font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 13px;
-    flex-shrink: 0;
+    color: #fff; font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 13px;
+    box-shadow: 0 0 16px rgba(124,58,237,0.4);
+    position: relative;
+    z-index: 1;
   }
-  .step h3 { font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 18px; margin-bottom: 8px; color: var(--text); }
-  .step p { font-size: 14px; color: var(--muted2); line-height: 1.75; }
+  .step h3 { font-family: 'IBM Plex Sans', sans-serif; font-weight: 600; font-size: 16px; margin-bottom: 6px; color: var(--text); }
+  .step p { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.65; }
 
-  /* === FEATURES === */
-  .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 14px; margin-top: 56px; }
+  /* === FEATURES - Simplified === */
+  .features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 28px; }
   .feature-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-    padding: 28px; transition: all 0.2s; position: relative; overflow: hidden;
-  }
-  .feature-card::after {
-    content: '';
-    position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
-    background: var(--grad1); opacity: 0; transition: opacity 0.2s;
-  }
-  .feature-card:hover { border-color: var(--border-glow); transform: translateY(-3px); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
-  .feature-card:hover::after { opacity: 1; }
-  .feature-card .feat-icon {
-    width: 42px; height: 42px; border-radius: 10px;
-    background: rgba(0,245,212,0.08); border: 1px solid rgba(0,245,212,0.15);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px; margin-bottom: 16px;
-  }
-  .feature-card h3 { font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 16px; margin-bottom: 10px; color: var(--text); }
-  .feature-card p { font-size: 13px; color: var(--muted2); line-height: 1.7; }
-
-  /* === WHO IT'S FOR === */
-  .users-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-top: 52px; }
-  .user-card {
     background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-    padding: 22px; text-align: center; transition: all 0.2s;
+    padding: 24px; transition: all 0.2s;
   }
-  .user-card:hover { border-color: rgba(0,245,212,0.3); box-shadow: 0 0 20px rgba(0,245,212,0.06); }
-  .user-card .uicon { font-size: 32px; margin-bottom: 12px; }
-  .user-card h4 { font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 13px; color: var(--text); }
+  .feature-card:hover { border-color: var(--border-glow); transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }
+  .feature-card .feat-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; margin-bottom: 14px;
+  }
+  .feature-card.purple .feat-icon { background: rgba(124,58,237,0.15); color: #a78bfa; }
+  .feature-card.amber .feat-icon { background: rgba(245,158,11,0.15); color: #fbbf24; }
+  .feature-card.green .feat-icon { background: rgba(34,197,94,0.15); color: #22c55e; }
+  .feature-card.red .feat-icon { background: rgba(239,68,68,0.15); color: #f87171; }
+  .feature-card.blue .feat-icon { background: rgba(59,130,246,0.15); color: #60a5fa; }
+  .feature-card.teal .feat-icon { background: rgba(20,184,166,0.15); color: #2dd4bf; }
+  .feature-card h3 { font-family: 'IBM Plex Sans', sans-serif; font-weight: 600; font-size: 15px; margin-bottom: 6px; color: var(--text); }
+  .feature-card p { font-size: 13px; color: rgba(255,255,255,0.45); line-height: 1.6; }
 
-  /* === PRICING === */
-  .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-top: 56px; }
-  .price-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
-    padding: 32px 28px; transition: all 0.2s;
+  /* === WHO IT'S FOR - Simplified === */
+  .users-grid { display: flex; gap: 14px; margin-top: 24px; flex-wrap: wrap; justify-content: center; }
+  .user-card {
+    background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px;
+    padding: 20px 24px; text-align: center; transition: all 0.2s; cursor: default;
+    width: 120px;
   }
-  .price-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+  .user-card:hover { border-color: rgba(124,58,237,0.4); background: rgba(124,58,237,0.06); transform: translateY(-2px); }
+  .user-card .uicon { width: 56px; height: 56px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 24px; }
+  .user-card h4 { font-family: 'IBM Plex Sans', sans-serif; font-weight: 500; font-size: 13px; color: rgba(255,255,255,0.7); }
+
+  /* === PRICING - Premium polish === */
+  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 28px; }
+  .price-card {
+    background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;
+    padding: 24px; transition: all 0.2s;
+  }
+  .price-card:hover { transform: translateY(-2px); }
   .price-card.featured {
-    border-color: var(--primary);
+    border-color: rgba(124,58,237,0.6);
     background: linear-gradient(145deg, rgba(124,58,237,0.08) 0%, var(--surface) 60%);
-    box-shadow: 0 0 40px rgba(124,58,237,0.15);
+    box-shadow: 0 0 32px rgba(124,58,237,0.15), 0 0 0 1px rgba(124,58,237,0.3);
+    transform: scale(1.02);
     position: relative;
   }
   .price-badge {
-    position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
-    background: var(--grad1); color: #fff; font-size: 10px; font-weight: 700;
-    letter-spacing: 0.1em; padding: 4px 16px; border-radius: 100px;
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.1em; padding: 3px 12px; border-radius: 999px;
     white-space: nowrap; font-family: 'IBM Plex Mono', monospace;
   }
-  .price-tier { font-size: 11px; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 12px; font-family: 'IBM Plex Mono', monospace; }
-  .price-amount { font-family: 'IBM Plex Sans', sans-serif; font-size: 46px; font-weight: 800; line-height: 1; color: var(--text); }
-  .price-amount sup { font-size: 20px; color: var(--muted2); vertical-align: super; }
-  .price-period { font-size: 12px; color: var(--muted); margin: 6px 0 24px; font-family: 'IBM Plex Mono', monospace; }
-  .price-features { list-style: none; display: grid; gap: 11px; margin-bottom: 28px; }
-  .price-features li { font-size: 13px; display: flex; gap: 10px; align-items: flex-start; color: var(--muted2); }
-  .price-features li::before { content: '✓'; color: var(--teal); flex-shrink: 0; font-weight: 700; }
+  .price-tier { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; font-family: 'IBM Plex Mono', monospace; }
+  .price-amount { font-family: 'IBM Plex Sans', sans-serif; font-size: 32px; font-weight: 800; line-height: 1; color: var(--text); }
+  .price-amount sup { font-size: 14px; color: var(--muted2); vertical-align: super; }
+  .price-period { font-size: 11px; color: var(--muted); margin: 4px 0 8px; font-family: 'IBM Plex Mono', monospace; }
+  .price-value { font-size: 10px; color: var(--teal); margin-bottom: 14px; font-family: 'IBM Plex Mono', monospace; }
+  .price-features { list-style: none; display: grid; gap: 8px; margin-bottom: 18px; }
+  .price-features li { font-size: 13px; display: flex; gap: 8px; align-items: flex-start; color: rgba(255,255,255,0.7); }
+  .price-features li::before { content: '✓'; color: #22c55e; flex-shrink: 0; font-size: 12px; }
+  .price-cost-note { font-size: 10px; color: var(--muted); background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 6px; margin-bottom: 14px; line-height: 1.6; font-family: 'IBM Plex Mono', monospace; }
+  .price-loss { font-size: 10px; color: var(--amber); background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); padding: 8px 12px; border-radius: 6px; margin-bottom: 14px; line-height: 1.6; font-family: 'IBM Plex Mono', monospace; }
   .btn-price {
     width: 100%; padding: 12px; border-radius: 8px;
     font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 700;
     cursor: pointer; letter-spacing: 0.05em; transition: all 0.2s;
     text-align: center; display: block; text-decoration: none;
-    border: 1px solid var(--border); background: transparent; color: var(--text);
+    border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: var(--text);
   }
-  .btn-price:hover { border-color: var(--border-glow); background: var(--surface2); }
+  .btn-price:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); }
   .btn-price.highlight {
-    background: var(--grad1); color: #fff; border: none;
-    box-shadow: 0 0 24px rgba(124,58,237,0.3);
+    background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; border: none;
+    box-shadow: 0 0 16px rgba(124,58,237,0.3);
   }
-  .btn-price.highlight:hover { box-shadow: 0 4px 32px rgba(124,58,237,0.5); transform: translateY(-1px); }
+  .btn-price.highlight:hover { transform: translateY(-1px); box-shadow: 0 0 24px rgba(124,58,237,0.4); }
+  .limited-offer {
+    margin-top: 20px; padding: 14px 20px; background: rgba(245,158,11,0.08); 
+    border: 1px solid rgba(245,158,11,0.25); border-left: 3px solid #f59e0b; 
+    border-radius: 10px; text-align: center;
+  }
+  .limited-offer-title { font-size: 13px; font-weight: 600; color: #f59e0b; margin-bottom: 4px; }
+  .limited-offer-text { font-size: 12px; color: rgba(255,255,255,0.6); }
+  .risk-free {
+    margin-top: 24px; padding: 20px 24px; background: rgba(34,197,94,0.05);
+    border: 1px solid rgba(34,197,94,0.15); border-radius: 12px;
+  }
+  .risk-free-title {
+    font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; 
+    color: #22c55e; font-weight: 600; margin-bottom: 12px; text-align: center;
+  }
+  .risk-free-items { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; }
+  .risk-free-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: rgba(255,255,255,0.5); }
+  .risk-free-item span:first-child { color: #22c55e; }
 
-  /* === SIGNUP === */
+  /* === SIGNUP - Simplified === */
   #signup {
     background: var(--surface);
     border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
   }
-  .signup-inner { max-width: 580px; margin: 0 auto; text-align: center; }
-  .signup-btn-row { display: flex; justify-content: center; margin-top: 36px; }
+  .signup-inner { max-width: 480px; margin: 0 auto; text-align: center; }
+  .signup-btn-row { display: flex; justify-content: center; margin-top: 24px; }
   .btn-signup {
     background: var(--grad1); color: #fff; border: none;
-    padding: 15px 40px; border-radius: 10px;
-    font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 700;
+    padding: 12px 28px; border-radius: 8px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 700;
     cursor: pointer; transition: all 0.2s; white-space: nowrap;
     text-decoration: none; display: inline-block;
-    box-shadow: 0 0 28px rgba(124,58,237,0.3);
   }
-  .btn-signup:hover { transform: translateY(-2px); box-shadow: 0 6px 36px rgba(124,58,237,0.45); }
-  .form-note { font-size: 12px; color: var(--muted); margin-top: 16px; font-family: 'IBM Plex Mono', monospace; }
+  .btn-signup:hover { transform: translateY(-1px); }
+  .form-note { font-size: 11px; color: var(--muted); margin-top: 12px; font-family: 'IBM Plex Mono', monospace; }
 
-  /* === FEEDBACK === */
+  /* === FEEDBACK - Simplified === */
   #feedback { background: var(--bg); border-top: 1px solid var(--border); }
   .feedback-form {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
-    padding: 40px; max-width: 620px; margin: 52px auto 0;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 24px; max-width: 480px; margin: 24px auto 0;
   }
-  .radio-group { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 12px 0 26px; }
-  .radio-btn {
-    aspect-ratio: 1; border: 1px solid var(--border); border-radius: 8px;
-    background: var(--surface2); color: var(--muted2); font-size: 14px; font-weight: 700;
-    cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center;
-    font-family: 'IBM Plex Mono', monospace;
-  }
-  .radio-btn:hover { border-color: rgba(0,245,212,0.4); color: var(--teal); }
-  .radio-btn.active { border-color: var(--teal); color: var(--teal); background: rgba(0,245,212,0.08); box-shadow: 0 0 14px rgba(0,245,212,0.1); }
-  .feedback-field { margin-bottom: 22px; }
-  .feedback-label { font-size: 10px; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; margin-bottom: 9px; font-family: 'IBM Plex Mono', monospace; }
+  .feedback-field { margin-bottom: 14px; }
+  .feedback-label { font-size: 10px; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; font-family: 'IBM Plex Mono', monospace; }
   .feedback-input, .feedback-textarea {
-    width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
-    padding: 12px 16px; color: var(--text); font-family: 'IBM Plex Sans', sans-serif; font-size: 13px;
+    width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
+    padding: 10px 12px; color: var(--text); font-family: 'IBM Plex Sans', sans-serif; font-size: 12px;
     outline: none; transition: border-color 0.2s;
   }
   .feedback-input:focus, .feedback-textarea:focus { border-color: rgba(0,245,212,0.4); }
-  .feedback-textarea { min-height: 88px; resize: vertical; }
+  .feedback-textarea { min-height: 60px; resize: vertical; }
   .success-msg {
-    display: none; text-align: center; padding: 28px;
-    color: var(--teal); font-size: 15px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 700;
+    display: none; text-align: center; padding: 20px;
+    color: var(--teal); font-size: 13px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600;
   }
 
 
-  /* === SOCIAL PROOF === */
+  /* === SOCIAL PROOF - Simplified === */
   .proof-section { background: var(--bg); border-top: 1px solid var(--border); }
-  .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 52px; }
+  .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px; }
   .testimonial-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-    padding: 28px; transition: all 0.2s; position: relative;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;
+    padding: 24px; transition: all 0.2s;
   }
-  .testimonial-card:hover { border-color: rgba(0,245,212,0.25); transform: translateY(-2px); }
-  .testimonial-card::before {
-    content: '"';
-    position: absolute; top: 16px; right: 20px;
-    font-size: 64px; color: var(--primary); opacity: 0.15;
-    font-family: 'IBM Plex Sans', sans-serif; line-height: 1;
-  }
-  .testimonial-text { font-size: 14px; color: var(--muted2); line-height: 1.8; margin-bottom: 20px; font-style: italic; }
-  .testimonial-author { display: flex; align-items: center; gap: 12px; }
+  .testimonial-card:hover { border-color: rgba(124,58,237,0.3); }
+  .testimonial-text { font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.7; margin-bottom: 16px; font-style: italic; position: relative; padding-left: 20px; }
+  .testimonial-text::before { content: '"'; position: absolute; left: 0; top: -8px; font-size: 48px; color: rgba(124,58,237,0.3); line-height: 1; }
+  .testimonial-author { display: flex; align-items: center; gap: 10px; }
   .author-avatar {
-    width: 36px; height: 36px; border-radius: 50%;
-    background: var(--grad1); display: flex; align-items: center; justify-content: center;
-    font-size: 16px; flex-shrink: 0;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, #7c3aed, #6d28d9); display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
   }
-  .author-name { font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 13px; color: var(--text); }
-  .author-role { font-size: 11px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; margin-top: 2px; }
-  .proof-stats { display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; margin-top: 52px; padding-top: 40px; border-top: 1px solid var(--border); }
+  .author-name { font-family: 'IBM Plex Sans', sans-serif; font-weight: 600; font-size: 13px; color: var(--text); }
+  .author-role { font-size: 11px; color: rgba(255,255,255,0.4); font-family: 'IBM Plex Mono', monospace; margin-top: 2px; }
+  .proof-stats { display: flex; gap: 32px; justify-content: center; flex-wrap: wrap; margin-top: 28px; padding-top: 28px; border-top: 1px solid var(--border); }
   .proof-stat { text-align: center; }
-  .proof-stat-num { font-family: 'IBM Plex Sans', sans-serif; font-size: 36px; font-weight: 800; background: var(--grad1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .proof-stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; font-family: 'IBM Plex Mono', monospace; }
-  .early-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.2); color: var(--primary2); font-size: 10px; letter-spacing: 0.1em; padding: 4px 12px; border-radius: 100px; font-family: 'IBM Plex Mono', monospace; margin-bottom: 8px; }
+  .proof-stat-num { font-family: 'IBM Plex Sans', sans-serif; font-size: 24px; font-weight: 800; background: var(--grad1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .proof-stat-label { font-size: 10px; color: var(--muted); margin-top: 2px; font-family: 'IBM Plex Mono', monospace; }
+  .early-badge { display: inline-flex; align-items: center; gap: 4px; background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.2); color: var(--primary2); font-size: 9px; letter-spacing: 0.1em; padding: 3px 10px; border-radius: 100px; font-family: 'IBM Plex Mono', monospace; margin-bottom: 6px; }
 
 
   /* === NAV ACTIVE STATE === */
@@ -486,30 +475,20 @@
   }
   .back-to-top.visible { opacity: 1; transform: translateY(0); pointer-events: all; }
   .back-to-top:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(124,58,237,0.55); }
-  /* === FOOTER === */
+  /* === FOOTER - Simplified === */
   footer {
-    border-top: 1px solid var(--border); padding: 36px 48px;
+    border-top: 1px solid var(--border); padding: 20px 24px;
     display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 12px;
+    flex-wrap: wrap; gap: 10px;
     background: var(--surface);
   }
-  footer p { font-size: 12px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; }
+  footer p { font-size: 11px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; }
 
   /* === ANIMATIONS === */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
   @keyframes pulse {
     0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,245,212,0.5); }
     50% { opacity: 0.8; box-shadow: 0 0 0 5px rgba(0,245,212,0); }
   }
-
-  .reveal {
-    opacity: 0; transform: translateY(22px);
-    transition: opacity 0.65s ease, transform 0.65s ease;
-  }
-  .reveal.visible { opacity: 1; transform: translateY(0); }
 
   /* Scrollbar */
   ::-webkit-scrollbar { width: 6px; }
@@ -521,9 +500,12 @@
   @media (max-width: 640px) {
     nav { padding: 0 20px; }
     .nav-links a:not(:last-child) { display: none; }
-    .problem-strip { gap: 18px; padding: 20px; }
-    section { padding: 70px 20px; }
-    .hero-stats { gap: 28px; }
+    .problem-strip { gap: 12px; padding: 14px; }
+    section { padding: 48px 16px; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .testimonials-grid { grid-template-columns: 1fr; }
+    .features-grid { grid-template-columns: 1fr; }
+    .problem-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -532,7 +514,7 @@
 <!-- NAV -->
 <nav>
   <a href="#" class="logo">
-    <div class="logo-icon">🔒</div>
+    <div class="logo-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div>
     <span class="logo-text">Scope<span>Lock</span></span>
   </a>
   <div class="nav-links">
@@ -549,6 +531,10 @@
 <!-- MOBILE NAV OVERLAY -->
 <div class="mobile-nav-overlay" id="mobileNav">
   <button class="mobile-nav-close" onclick="toggleMobileNav()">✕</button>
+  <a href="#" onclick="toggleMobileNav()" class="logo" style="margin-bottom:20px;">
+    <div class="logo-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div>
+    <span class="logo-text">Scope<span>Lock</span></span>
+  </a>
   <a href="#how-it-works" onclick="toggleMobileNav()">How it works</a>
   <a href="#pricing" onclick="toggleMobileNav()">Pricing</a>
   <a href="#feedback" onclick="toggleMobileNav()">Feedback</a>
@@ -557,50 +543,61 @@
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-grid-bg"></div>
-  <div class="badge"><span class="badge-dot"></span>Now in Early Access — Free to Try</div>
+  <div class="badge"><span class="badge-dot"></span>Early Access — Free to Try</div>
   <h1 class="hero-title">Your project scope is<br/><em>silently drifting.</em></h1>
-  <p class="hero-sub">Freelancers and project managers use ScopeLock to ship on time, get paid for every change, and end client disputes — without awkward conversations.</p>
+  <p class="hero-sub">Freelancers and project managers use ScopeLock to ship on time, get paid for every change.</p>
   <div class="hero-actions">
-    <a href="app.html" class="btn-hero">🔒 Create Your Free Account →</a>
-    <a href="#how-it-works" class="btn-ghost">See How It Works</a>
+    <a href="app.html" class="btn-hero">Start Free Trial</a>
+    <a href="#how-it-works" class="btn-ghost">How It Works</a>
+  </div>
+  <div class="mockup-carousel">
+    <div class="mockup-track">
+      <div class="mockup-slide active"><img src="dashboard.png" /></div>
+      <div class="mockup-slide"><img src="analytics.png" /></div>
+    </div>
+    <div class="mockup-dots">
+      <span class="dot active"></span>
+      <span class="dot"></span>
+    </div>
   </div>
 </section>
 
 <!-- PROBLEM STRIP -->
 <div class="problem-strip">
-  <div class="ps-item"><span class="ps-icon">💸</span><span><strong>50%</strong> of projects go over budget</span></div>
-  <div class="ps-item"><span class="ps-icon">⏱️</span><span><strong>70%</strong> of scope changes come from informal chat</span></div>
-  <div class="ps-item"><span class="ps-icon">🔥</span><span><strong>#1 cause</strong> of freelancer burnout</span></div>
-  <div class="ps-item"><span class="ps-icon">📉</span><span><strong>No tool</strong> enforces scope boundaries</span></div>
+  <div class="ps-item"><span><strong>50%</strong> of projects go over budget</span></div>
+  <div class="ps-dot"></div>
+  <div class="ps-item"><span><strong>70%</strong> of scope changes come from informal chat</span></div>
+  <div class="ps-dot"></div>
+  <div class="ps-item"><span><strong>#1 cause</strong> of freelancer burnout</span></div>
+  <div class="ps-dot"></div>
+  <div class="ps-item"><span><strong>No tool</strong> enforces scope boundaries</span></div>
 </div>
 
 <!-- PROBLEM SECTION -->
 <section>
   <div class="container">
-    <div class="section-label reveal">The Problem</div>
-    <h2 class="section-title reveal">Your tools track tasks.<br/>None of them guard your scope.</h2>
-    <p class="section-sub reveal">Jira. ClickUp. Trello. Great for tracking tasks. But clients and teammates add new work through Slack and email — and your timeline quietly breaks.</p>
+    <div class="section-label">The Problem</div>
+    <h2 class="section-title">Your tools track tasks.<br/>None guard your scope.</h2>
     <div class="problem-grid">
-      <div class="problem-card reveal">
-        <div class="icon">💬</div>
+      <div class="problem-card">
+        <div class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>
         <h3>The Slack Change</h3>
-        <p>"Hey can we just add one more thing?" — A casual message that costs you 3 days. No record. No approval. No accountability.</p>
+        <p>"Hey add one more thing" — costs 3 days. No record. No approval.</p>
       </div>
-      <div class="problem-card reveal">
-        <div class="icon">📧</div>
+      <div class="problem-card">
+        <div class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></div>
         <h3>The Email Assumption</h3>
-        <p>Client replied to an email thinking it was approved. You missed it. Now it's 2 weeks before launch and the feature doesn't exist.</p>
+        <p>Client thinks it's approved. You missed it. Feature doesn't exist at launch.</p>
       </div>
-      <div class="problem-card reveal">
-        <div class="icon">😤</div>
+      <div class="problem-card">
+        <div class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg></div>
         <h3>The Dispute</h3>
-        <p>"We agreed this was included." No you didn't. But you have no proof. The client is angry, you're exhausted, and the project is late.</p>
+        <p>"We agreed this was included." You have no proof. Project is late.</p>
       </div>
-      <div class="problem-card reveal">
-        <div class="icon">📉</div>
+      <div class="problem-card">
+        <div class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div>
         <h3>The Silent Overrun</h3>
-        <p>By the time you notice scope drift, you've already absorbed the cost. The project that was 4 weeks somehow took 8.</p>
+        <p>4 weeks becomes 8 — you've already absorbed the cost.</p>
       </div>
     </div>
   </div>
@@ -609,36 +606,35 @@
 <!-- HOW IT WORKS -->
 <section id="how-it-works" style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
   <div class="container">
-    <div class="section-label reveal">How ScopeLock Works</div>
-    <h2 class="section-title reveal">Three steps to scope certainty.</h2>
-    <p class="section-sub reveal">Designed for freelancers, small teams, and agencies. No onboarding call. Start in under 5 minutes.</p>
+    <div class="section-label">How It Works</div>
+    <h2 class="section-title">Three steps to scope certainty.</h2>
     <div class="steps">
-      <div class="step reveal">
-        <div class="step-num">01</div>
+      <div class="step">
+        <div class="step-num">1</div>
         <div>
-          <h3>🔒 Lock the Scope Baseline</h3>
-          <p>Write what's included in the project — and explicitly what's NOT. Once locked, it becomes a permanent record. Every stakeholder knows exactly what was agreed, and when.</p>
+          <h3>Lock Your Scope</h3>
+          <p>Write what's in and out. Once locked, it becomes a permanent record everyone can reference.</p>
         </div>
       </div>
-      <div class="step reveal">
-        <div class="step-num">02</div>
+      <div class="step">
+        <div class="step-num">2</div>
         <div>
-          <h3>📋 Log Every Change Request</h3>
-          <p>When a client wants to add, remove, or change something, you submit a formal Change Request with description, estimated hours, and additional charge. Nothing gets done from a Slack message ever again.</p>
+          <h3>Log Changes</h3>
+          <p>Submit formal Change Requests with hours and charges. Nothing from Slack gets done automatically.</p>
         </div>
       </div>
-      <div class="step reveal">
-        <div class="step-num">03</div>
+      <div class="step">
+        <div class="step-num">3</div>
         <div>
-          <h3>✅ Approve or Reject — With Full Audit Trail</h3>
-          <p>You approve or reject each change — with an optional rejection reason visible to the client. Every decision is timestamped and recorded forever in the audit log.</p>
+          <h3>Approve or Reject</h3>
+          <p>One-click approval with full audit trail. Every decision is recorded forever.</p>
         </div>
       </div>
-      <div class="step reveal">
-        <div class="step-num">04</div>
+      <div class="step">
+        <div class="step-num">4</div>
         <div>
-          <h3>📊 Watch Your Scope Drift Dashboard</h3>
-          <p>At any moment, see how much work has deviated from the original scope. Generate an invoice from approved changes in one click — with actual hours and charges, not guesses.</p>
+          <h3>Track Drift</h3>
+          <p>See how much work has deviated. Generate invoices from approved changes in one click.</p>
         </div>
       </div>
     </div>
@@ -648,38 +644,81 @@
 <!-- FEATURES -->
 <section>
   <div class="container">
-    <div class="section-label reveal">Features</div>
-    <h2 class="section-title reveal">Everything you need.<br/>Nothing you don't.</h2>
+    <div class="section-label">Features</div>
+    <h2 class="section-title">Everything you need.</h2>
     <div class="features-grid">
-      <div class="feature-card reveal">
-        <div class="feat-icon">🔒</div>
-        <h3>Scope Baseline Snapshot</h3>
-        <p>Write the project scope once. Lock it. It becomes a permanent, tamper-proof record that everyone can reference at any time.</p>
+      <div class="feature-card purple">
+        <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div>
+        <h3>Scope Baseline</h3>
+        <p>Lock your scope as a permanent, tamper-proof record.</p>
       </div>
-      <div class="feature-card reveal">
-        <div class="feat-icon">📋</div>
-        <h3>Change Request Ledger</h3>
-        <p>Every proposed change is formally logged with description, requester, estimated hours, additional charge, and impact level.</p>
+      <div class="feature-card amber">
+        <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg></div>
+        <h3>Change Ledger</h3>
+        <p>Every change logged with hours and charges.</p>
       </div>
-      <div class="feature-card reveal">
-        <div class="feat-icon">✅</div>
-        <h3>Approval Workflow + Rejection Reasons</h3>
-        <p>Approve or reject with one click. Rejection reasons are recorded and visible to clients — no more "we never discussed this."</p>
+      <div class="feature-card green">
+        <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg></div>
+        <h3>Approval Workflow</h3>
+        <p>One-click approve or reject with audit trail.</p>
       </div>
-      <div class="feature-card reveal">
-        <div class="feat-icon">📊</div>
-        <h3>Scope Drift Indicator</h3>
-        <p>A live visual showing how much your project has deviated from the original scope — so you're never blindsided.</p>
+      <div class="feature-card red">
+        <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></div>
+        <h3>Drift Indicator</h3>
+        <p>Live view of how much you've deviated.</p>
       </div>
-      <div class="feature-card reveal">
-        <div class="feat-icon">🧾</div>
+      <div class="feature-card blue">
+        <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div>
         <h3>Invoice Generator</h3>
-        <p>Generate a professional invoice from all approved changes. Uses actual hours and charges you entered — not guesses based on impact labels.</p>
+        <p>One-click invoices from approved changes.</p>
       </div>
-      <div class="feature-card reveal">
-        <div class="feat-icon">🔗</div>
-        <h3>Client Share Links</h3>
-        <p>Send clients a read-only link to view scope, see all CRs, and leave comments per change request — no account needed.</p>
+      <div class="feature-card teal">
+        <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></div>
+        <h3>Client Links</h3>
+        <p>Share read-only links — no account needed.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+  <div class="container">
+    <div class="section-label" style="justify-content:center;">Testimonials</div>
+    <h2 class="section-title" style="text-align:center;">What users are saying.</h2>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 32px;">
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 24px;">
+        <div style="font-size: 48px; color: rgba(124,58,237,0.3); line-height: 1; margin-bottom: 12px;">"</div>
+        <p style="font-size: 14px; line-height: 1.7; color: rgba(255,255,255,0.7); font-style: italic; margin-bottom: 16px;">ScopeLock saved me from a $3,000 scope dispute. The client tried to add 5 features post-launch. I just sent them the locked scope PDF.</p>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #6d28d9); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff;">AR</div>
+          <div>
+            <div style="font-weight: 600; font-size: 13px;">Alex R.</div>
+            <div style="font-size: 11px; opacity: 0.4;">Freelance Developer</div>
+          </div>
+        </div>
+      </div>
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 24px;">
+        <div style="font-size: 48px; color: rgba(124,58,237,0.3); line-height: 1; margin-bottom: 12px;">"</div>
+        <p style="font-size: 14px; line-height: 1.7; color: rgba(255,255,255,0.7); font-style: italic; margin-bottom: 16px;">We onboard every client with a locked scope now. Change requests went from awkward to automatic.</p>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #6d28d9); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff;">MT</div>
+          <div>
+            <div style="font-weight: 600; font-size: 13px;">Maria T.</div>
+            <div style="font-size: 11px; opacity: 0.4;">Design Agency Owner</div>
+          </div>
+        </div>
+      </div>
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 24px;">
+        <div style="font-size: 48px; color: rgba(124,58,237,0.3); line-height: 1; margin-bottom: 12px;">"</div>
+        <p style="font-size: 14px; line-height: 1.7; color: rgba(255,255,255,0.7); font-style: italic; margin-bottom: 16px;">The drift indicator alone is worth it. I can see exactly how far we've gone from the original plan.</p>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #6d28d9); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff;">JK</div>
+          <div>
+            <div style="font-weight: 600; font-size: 13px;">James K.</div>
+            <div style="font-size: 11px; opacity: 0.4;">Project Manager</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -688,194 +727,139 @@
 <!-- WHO IT'S FOR -->
 <section style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
   <div class="container" style="text-align:center;">
-    <div class="section-label reveal" style="justify-content:center;">Who It's For</div>
-    <h2 class="section-title reveal">Built for the builders<br/>tired of scope surprises.</h2>
+    <div class="section-label" style="justify-content:center;">Who It's For</div>
+    <h2 class="section-title">Built for builders tired of scope surprises.</h2>
     <div class="users-grid">
-      <div class="user-card reveal"><div class="uicon">💻</div><h4>Freelancers</h4></div>
-      <div class="user-card reveal"><div class="uicon">🏢</div><h4>Dev Agencies</h4></div>
-      <div class="user-card reveal"><div class="uicon">🚀</div><h4>Startups</h4></div>
-      <div class="user-card reveal"><div class="uicon">📐</div><h4>Design Studios</h4></div>
-      <div class="user-card reveal"><div class="uicon">🛠️</div><h4>Internal Teams</h4></div>
+      <div class="user-card"><div class="uicon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg></div><h4>Freelancers</h4></div>
+      <div class="user-card"><div class="uicon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></div><h4>Agencies</h4></div>
+      <div class="user-card"><div class="uicon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path></svg></div><h4>Startups</h4></div>
+      <div class="user-card"><div class="uicon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg></div><h4>Design</h4></div>
+      <div class="user-card"><div class="uicon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div><h4>Teams</h4></div>
     </div>
-  </div>
-</section>
-
-<!-- SOCIAL PROOF -->
-<section class="proof-section">
-  <div class="container">
-    <div class="section-label reveal" style="justify-content:center;">Early Feedback</div>
-    <h2 class="section-title reveal" style="text-align:center;">What early testers are saying.</h2>
-    <p class="section-sub reveal" style="margin:0 auto;text-align:center;">Real feedback from freelancers and developers who tried ScopeLock during beta.</p>
-    <div class="testimonials-grid">
-
-      <div class="testimonial-card reveal">
-        <div class="early-badge">✦ Beta Tester</div>
-        <p class="testimonial-text">"I've been freelancing for 3 years and scope creep has always been my biggest headache. ScopeLock is the first tool that actually makes it easy to say no — with proof to back it up."</p>
-        <div class="testimonial-author">
-          <div class="author-avatar">💻</div>
-          <div>
-            <div class="author-name">Web Developer</div>
-            <div class="author-role">Freelancer · Beta Tester</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="testimonial-card reveal">
-        <div class="early-badge">✦ Beta Tester</div>
-        <p class="testimonial-text">"The client share link is a game changer. My client can see exactly what was agreed and what changed — no more 'I thought this was included' conversations."</p>
-        <div class="testimonial-author">
-          <div class="author-avatar">🏢</div>
-          <div>
-            <div class="author-name">Project Manager</div>
-            <div class="author-role">Dev Agency · Beta Tester</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="testimonial-card reveal">
-        <div class="early-badge">✦ Beta Tester</div>
-        <p class="testimonial-text">"The invoice generator alone is worth it. Before ScopeLock I was manually computing extra charges. Now it pulls everything automatically from approved CRs."</p>
-        <div class="testimonial-author">
-          <div class="author-avatar">📐</div>
-          <div>
-            <div class="author-name">UI/UX Designer</div>
-            <div class="author-role">Design Studio · Beta Tester</div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="proof-stats reveal">
-      <div class="proof-stat">
-        <div class="proof-stat-num">5 min</div>
-        <div class="proof-stat-label">avg. time to first project</div>
-      </div>
-      <div class="proof-stat">
-        <div class="proof-stat-num">100%</div>
-        <div class="proof-stat-label">of testers would try again</div>
-      </div>
-      <div class="proof-stat">
-        <div class="proof-stat-num">Free</div>
-        <div class="proof-stat-label">no credit card required</div>
-      </div>
-    </div>
-
   </div>
 </section>
 
 <!-- PRICING -->
-<section id="pricing">
-  <div class="container">
-    <div class="section-label reveal">Pricing</div>
-    <h2 class="section-title reveal">Simple, honest pricing.</h2>
-    <p class="section-sub reveal">No per-seat confusion. No feature gating on what you actually need. Pay for projects, not people.</p>
-    <div class="pricing-grid">
-      <div class="price-card reveal">
-        <div class="price-tier">Free</div>
-        <div class="price-amount">$0</div>
-        <div class="price-period">forever</div>
-        <ul class="price-features">
-          <li>1 Active Project</li>
-          <li>Unlimited Change Requests</li>
-          <li>Approve / Reject Workflow</li>
-          <li>Scope Drift Dashboard</li>
-        </ul>
-        <a href="app.html" class="btn-price">Start Free — No Card Needed</a>
+  <section id="pricing">
+    <div class="container">
+      <div class="section-label" style="justify-content:center;">Pricing</div>
+      <h2 class="section-title" style="text-align:center;">Simple, honest pricing.</h2>
+      
+      <div style="display: flex; gap: 4px; background: var(--surface); border-radius: 8px; padding: 4px; width: fit-content; margin: 0 auto 24px;">
+        <button onclick="document.getElementById('pricing-grid').style.display='grid';this.style.background='var(--surface2)';this.style.color='var(--text)';document.getElementById('annual-toggle').style.display='none';document.getElementById('monthly-btn').style.background='transparent';document.getElementById('monthly-btn').style.color='var(--muted)';" id="monthly-btn" style="padding: 8px 16px; border-radius: 6px; border: none; background: var(--surface2); color: var(--text); font-size: 12px; font-weight: 600; cursor: pointer;">Monthly</button>
+        <button onclick="document.getElementById('pricing-grid').style.display='grid';this.style.background='var(--surface2)';this.style.color='var(--text)';document.getElementById('annual-toggle').style.display='block';document.getElementById('monthly-btn').style.background='transparent';document.getElementById('monthly-btn').style.color='var(--muted)'" style="padding: 8px 16px; border-radius: 6px; border: none; background: transparent; color: var(--muted); font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;">Annual <span style="background: var(--green); color: #000; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px;">Save 20%</span></button>
       </div>
-      <div class="price-card featured reveal">
-        <div class="price-badge">MOST POPULAR</div>
-        <div class="price-tier">Pro</div>
-        <div class="price-amount"><sup>$</sup>9</div>
-        <div class="price-period">per month</div>
-        <ul class="price-features">
-          <li>Up to 5 Active Projects</li>
-          <li>All Free features</li>
-          <li>Client Share Links</li>
-          <li>Invoice Generator</li>
-          <li>PDF &amp; CSV Export</li>
-          <li>Email Notifications</li>
-        </ul>
-        <a href="app.html" class="btn-price highlight">Get Early Access — Try Free</a>
+      <div id="annual-toggle" style="display: none; text-align: center; margin-bottom: 16px; font-size: 12px; color: var(--amber);">20% discount applied!</div>
+      
+      <div class="pricing-grid" id="pricing-grid">
+        <div class="price-card">
+          <div class="price-tier">Free</div>
+          <div class="price-amount">$0</div>
+          <div class="price-period">forever</div>
+          <div class="price-value">Start protecting your scope today</div>
+          <ul class="price-features">
+            <li>1 Active Project</li>
+            <li>Unlimited CRs</li>
+            <li>Approve / Reject workflow</li>
+            <li>Scope Drift tracking</li>
+          </ul>
+          <a href="app.html" class="btn-price">Get Started Free</a>
+        </div>
+        <div class="price-card featured">
+          <div class="price-badge">⚡ FIRST 5 SUBS = LIFETIME</div>
+          <div class="price-tier">Pro</div>
+          <div class="price-amount"><sup>$</sup>9</div>
+          <div class="price-period">lifetime</div>
+          <div class="price-value">Only 5 spots — lock in forever</div>
+          <ul class="price-features">
+            <li>5 Active Projects</li>
+            <li>All Free features</li>
+            <li>PDF & CSV export</li>
+            <li>Client share links</li>
+            <li>Invoice generator</li>
+            <li>Client comment threads</li>
+            <li>E-signature on baseline</li>
+            <li>Priority email support</li>
+          </ul>
+          <a href="app.html" class="btn-price highlight">Start 14-Day Free Trial</a>
+        </div>
+        <div class="price-card">
+          <div class="price-tier">Business</div>
+          <div class="price-amount"><sup>$</sup>19</div>
+          <div class="price-period">per month</div>
+          <div class="price-value">Unlimited power for teams</div>
+          <ul class="price-features">
+            <li>Unlimited Projects</li>
+            <li>All Pro features</li>
+            <li>Team roles & permissions</li>
+            <li>Analytics dashboard</li>
+            <li>Priority support</li>
+            <li>Webhook integrations</li>
+          </ul>
+          <a href="app.html" class="btn-price" style="border-color:rgba(124,58,237,0.4);">Go Business</a>
+        </div>
       </div>
-      <div class="price-card reveal">
-        <div class="price-tier">Business</div>
-        <div class="price-amount"><sup>$</sup>19</div>
-        <div class="price-period">per month</div>
-        <ul class="price-features">
-          <li>Unlimited Projects</li>
-          <li>All Pro features</li>
-          <li>Team Admin Dashboard</li>
-          <li>Priority Support</li>
-          <li>API Access</li>
-        </ul>
-        <a href="app.html" class="btn-price">Get Early Access — Try Free</a>
+      
+      <!-- Limited Time Offer -->
+      <div class="limited-offer">
+        <div class="limited-offer-title">🎉 First 5 Subscribers = Lifetime Access</div>
+        <div class="limited-offer-text">Be one of the first 5 to subscribe and get Pro forever — no monthly payments, ever.</div>
+      </div>
+      
+      <!-- Risk-Free Guarantee -->
+      <div class="risk-free">
+        <div class="risk-free-title">Risk-Free Guarantee</div>
+        <div class="risk-free-items">
+          <div class="risk-free-item"><span>✓</span> 14-day trial</div>
+          <div class="risk-free-item"><span>✓</span> No credit card</div>
+          <div class="risk-free-item"><span>✓</span> Cancel anytime</div>
+          <div class="risk-free-item"><span>✓</span> 30-day refund</div>
+        </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
 <!-- SIGNUP -->
 <section id="signup">
   <div class="signup-inner">
-    <div class="section-label reveal" style="justify-content:center;">Early Access</div>
-    <h2 class="section-title reveal" style="text-align:center;">Stop scope creep today.<br/>It's free to start.</h2>
-    <p class="section-sub reveal" style="margin:0 auto;text-align:center;">Early users get Pro free for 3 months. No credit card. No spam.</p>
-    <div class="signup-btn-row reveal">
-      <a href="app.html" class="btn-signup">🔒 Create Your Free Account →</a>
+    <div class="section-label" style="justify-content:center;">Get Started</div>
+    <h2 class="section-title" style="text-align:center;">Stop scope creep today.</h2>
+    <div class="signup-btn-row">
+      <a href="app.html" class="btn-signup">Start Free Trial</a>
     </div>
-    <div class="form-note reveal">No credit card · No spam · Cancel anytime</div>
+    <div class="form-note">🎉 14-day Pro trial · No credit card required</div>
+    <div style="font-size: 10px; color: var(--muted); margin-top: 8px; display: flex; gap: 12px; justify-content: center;">
+      <span style="display: flex; align-items: center; gap: 4px;">🔒 30-day money-back</span>
+      <span style="display: flex; align-items: center; gap: 4px;">✅ No questions asked</span>
+    </div>
   </div>
 </section>
 
 <!-- FEEDBACK SECTION -->
 <section id="feedback">
   <div class="container">
-    <div class="section-label reveal" style="justify-content:center;">Beta Feedback</div>
-    <h2 class="section-title reveal" style="text-align:center;">Tried the app?<br/>Tell us what you think.</h2>
-    <p class="section-sub reveal" style="margin:0 auto;text-align:center;">Your feedback directly shapes ScopeLock. We read every single response.</p>
-    <div class="feedback-form reveal">
+    <div class="section-label" style="justify-content:center;">Beta Feedback</div>
+    <h2 class="section-title" style="text-align:center;">Tried the app? Tell us what you think.</h2>
+    <div class="feedback-form">
       <div id="feedbackFormInner">
         <div class="feedback-field">
-          <div class="feedback-label">Your Name <span style="color:var(--muted);font-size:10px;">(optional)</span></div>
-          <input class="feedback-input" id="fbName" type="text" placeholder="e.g. Juan dela Cruz" />
-        </div>
-        <div class="feedback-field">
           <div class="feedback-label">Your Role</div>
-          <input class="feedback-input" id="fbRole" type="text" placeholder="e.g. Freelancer, Developer, Project Manager..." />
+          <input class="feedback-input" id="fbRole" type="text" placeholder="e.g. Freelancer, Developer..." />
         </div>
         <div class="feedback-field">
-          <div class="feedback-label">How likely are you to use ScopeLock on a real project? (1–5)</div>
-          <div class="radio-group" id="ratingGroup">
-            <button class="radio-btn" onclick="selectRating(this,1)">1</button>
-            <button class="radio-btn" onclick="selectRating(this,2)">2</button>
-            <button class="radio-btn" onclick="selectRating(this,3)">3</button>
-            <button class="radio-btn" onclick="selectRating(this,4)">4</button>
-            <button class="radio-btn" onclick="selectRating(this,5)">5</button>
-          </div>
+          <div class="feedback-label">What did you like?</div>
+          <textarea class="feedback-textarea" id="fbLiked" placeholder="What felt useful or clear..."></textarea>
         </div>
         <div class="feedback-field">
-          <div class="feedback-label">What did you like about ScopeLock?</div>
-          <textarea class="feedback-textarea" id="fbLiked" placeholder="Tell us what felt useful or clear..."></textarea>
+          <div class="feedback-label">What could be improved?</div>
+          <textarea class="feedback-textarea" id="fbConfused" placeholder="What felt clunky or unclear..."></textarea>
         </div>
-        <div class="feedback-field">
-          <div class="feedback-label">What confused you or didn't work well?</div>
-          <textarea class="feedback-textarea" id="fbConfused" placeholder="Anything that felt clunky, missing, or unclear..."></textarea>
-        </div>
-        <div class="feedback-field">
-          <div class="feedback-label">What feature do you wish existed?</div>
-          <textarea class="feedback-textarea" id="fbWish" placeholder="Dream feature you'd love to see..."></textarea>
-        </div>
-        <div class="feedback-field">
-          <div class="feedback-label">Would you use it again?</div>
-          <input class="feedback-input" id="fbAgain" type="text" placeholder="Yes / Maybe / No — and why" />
-        </div>
-        <button class="btn-signup" style="width:100%;padding:14px;font-size:13px;border-radius:10px;" onclick="submitFeedback()">
-          Submit Feedback →
+        <button class="btn-signup" style="width:100%;padding:12px;font-size:12px;border-radius:8px;" onclick="submitFeedback()">
+          Submit Feedback
         </button>
       </div>
       <div class="success-msg" id="feedbackSuccess">
-        🙏 Thank you! This is exactly what helps us build something people actually want.
+        Thank you for your feedback!
       </div>
     </div>
   </div>
@@ -883,8 +867,8 @@
 
 <!-- FOOTER -->
 <footer>
-  <a href="#" class="logo" style="font-size:15px;text-decoration:none;">
-    <div class="logo-icon" style="width:26px;height:26px;font-size:13px;">🔒</div>
+  <a href="#" class="logo" style="font-size:15px;">
+    <div class="logo-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div>
     <span class="logo-text">Scope<span>Lock</span></span>
   </a>
   <p>Lock scope. Track changes. Ship on time. · Built by Raejohn Carandang</p>
@@ -898,51 +882,45 @@
 </footer>
 
 <script>
-
-  // Back to top
-  window.addEventListener('scroll', () => {
-    const backToTop = document.getElementById('backToTop');
-    if (!backToTop) return;
-    if (window.scrollY > 400) backToTop.classList.add('visible');
-    else backToTop.classList.remove('visible');
-  });
-
-
-  // Nav active state on scroll
-  const sections = ['how-it-works', 'pricing', 'feedback'];
-  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
-  const sectionObserver = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        navLinks.forEach(a => a.classList.remove('nav-active'));
-        const active = document.querySelector(`.nav-links a[href="#${e.target.id}"]`);
-        if (active) active.classList.add('nav-active');
-      }
-    });
-  }, { threshold: 0.4 });
-  sections.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) sectionObserver.observe(el);
-  });
-
   // Mobile nav
   function toggleMobileNav() {
     document.getElementById('mobileNav').classList.toggle('open');
   }
 
-  // Scroll reveal
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-  }, { threshold: 0.1 });
-  document.querySelectorAll('.reveal').forEach(r => observer.observe(r));
+  // Hero carousel
+  let current = 0;
+  const slides = 2;
+  const track = document.querySelector('.mockup-track');
+  const dots = document.querySelectorAll('.mockup-dots .dot');
+  let timer;
 
-  // Rating
-  let selectedRating = 0;
-  function selectRating(btn, val) {
-    selectedRating = val;
-    document.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+  function goTo(index) {
+    current = index;
+    track.style.transform = `translateX(-${current * 50}%)`;
+    dots.forEach((d, i) => d.classList.toggle('active', i === current));
   }
+
+  function next() {
+    goTo((current + 1) % slides);
+  }
+
+  function startTimer() {
+    timer = setInterval(next, 4000);
+  }
+
+  function stopTimer() {
+    clearInterval(timer);
+  }
+
+  dots.forEach((dot, i) => dot.addEventListener('click', () => {
+    stopTimer();
+    goTo(i);
+    startTimer();
+  }));
+
+  document.querySelector('.mockup-carousel').addEventListener('mouseenter', stopTimer);
+  document.querySelector('.mockup-carousel').addEventListener('mouseleave', startTimer);
+  startTimer();
 
   // Supabase config
   const SUPABASE_URL = "https://vbsvcduprffogqtvsvoy.supabase.co";
@@ -953,11 +931,9 @@
     const role = document.getElementById('fbRole').value.trim();
     const liked = document.getElementById('fbLiked').value.trim();
     const confused = document.getElementById('fbConfused').value.trim();
-    const wish = document.getElementById('fbWish').value.trim();
-    const again = document.getElementById('fbAgain').value.trim();
 
     if (!role || !liked) {
-      alert('Please fill in at least your role and what you liked.');
+      alert('Please fill in your role and what you liked.');
       return;
     }
 
@@ -975,13 +951,9 @@
           'Prefer': 'return=minimal'
         },
         body: JSON.stringify({
-          name: document.getElementById('fbName').value.trim() || null,
           role,
-          rating: selectedRating || null,
           liked,
-          confused,
-          wished_feature: wish,
-          would_use_again: again
+          confused
         })
       });
 
@@ -989,20 +961,17 @@
         document.getElementById('feedbackFormInner').style.display = 'none';
         document.getElementById('feedbackSuccess').style.display = 'block';
       } else {
-        const err = await res.text();
-        console.error('Supabase error:', err);
         alert('Something went wrong. Please try again.');
-        btn.textContent = 'Submit Feedback →';
+        btn.textContent = 'Submit Feedback';
         btn.disabled = false;
       }
     } catch (e) {
-      console.error('Network error:', e);
       alert('Network error. Please try again.');
-      btn.textContent = 'Submit Feedback →';
+      btn.textContent = 'Submit Feedback';
       btn.disabled = false;
     }
   }
 </script>
-<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">↑</button>
+
 </body>
 </html>
