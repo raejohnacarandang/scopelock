@@ -2981,10 +2981,10 @@ function App(){
   async function loadBillingHistory(){
     if(!user||isDemoMode)return;
     try{
-      const response=await fetch(`${API_BASE}/billing-history?userId=${user.id}`,{headers:{"Authorization":`Bearer ${user.access_token}`,"apikey":SUPABASE_ANON_KEY}});
+      const response=await fetch(`${API_BASE}/billing-history?userId=${user.id}`);
       const data=await response.json();
       if(data.invoices){
-        setBilling(b=>({...b,invoices:data.invoices}));
+        setBilling(b=>({...b,invoices:data.invoices||[]}));
       }
     }catch(e){
       console.log("Billing history load error:",e);
