@@ -4814,7 +4814,7 @@ function App(){
             <div style={{display:"grid",gap:16}}>
               <div className="card" style={{padding:24}}>
                 <h3 style={{fontSize:15,fontWeight:600,marginBottom:16,display:"flex",alignItems:"center",gap:8}}><Icon name="Card" size={16} color="var(--teal)"/> Billing & Plans</h3>
-                <BillingView plan={plan} setPlan={p=>{setPlan(p);notify(`✅ Switched to ${p} plan`);}} user={user} billing={billing} setBilling={setBilling} createCheckoutSession={createCheckoutSession} loadBillingHistory={loadBillingHistory} isDemoMode={isDemoMode} notify={notify} trialEndAt={window.__trialEndAt}/>
+                <BillingView plan={plan} setPlan={p=>{setPlan(p);notify(`✅ Switched to ${p} plan`);}} user={user} billing={billing} setBilling={setBilling} createCheckoutSession={createCheckoutSession} loadBillingHistory={loadBillingHistory} isDemoMode={isDemoMode} notify={notify} trialEndAt={window.__trialEndAt} API_BASE={API_BASE}/>
               </div>
               <div className="card" style={{padding:24}}>
                 <h3 style={{fontSize:15,fontWeight:600,marginBottom:16,display:"flex",alignItems:"center",gap:8}}><Icon name="Palette" size={16} color="var(--primary)"/> Branding</h3>
@@ -4848,7 +4848,7 @@ function App(){
 }
 
 
-function BillingView({plan,setPlan,user,billing,setBilling,createCheckoutSession,loadBillingHistory,isDemoMode,notify,trialEndAt}){
+function BillingView({plan,setPlan,user,billing,setBilling,createCheckoutSession,loadBillingHistory,isDemoMode,notify,trialEndAt,API_BASE}){
   const [billingTab,setBillingTab]=React.useState("plans");
   const [showAddCard,setShowAddCard]=React.useState(false);
   const [processing,setProcessing]=React.useState(false);
