@@ -4896,8 +4896,8 @@ function BillingView({plan,setPlan,user,billing,setBilling,createCheckoutSession
           });
           const result=await response.json();
           if(result.error){throw new Error(result.error);}
-          // Reload profile to get trial
-          await loadUserProfile();
+          // Reload billing after trial starts
+          await loadBillingHistory();
           notify("✅ 14-day Pro trial started! Complete your purchase anytime before it ends.");
         }catch(e){
           notify("❌ Error starting trial: "+e.message);
