@@ -4876,8 +4876,12 @@ function BillingView({plan,setPlan,user,billing,setBilling,createCheckoutSession
   const handleSubscribe=async(priceId)=>{
     if(isDemoMode){notify("Demo mode - upgrade works in real account");setPlan(priceId==="price_pro_monthly"?"pro":"biz");return;}
     if(!user){notify("Please sign in first");return;}
-    // Get current trial status
-    const{data:profile}=await supabase.from("user_profiles").select("trial_status,payment_type,is_lifetime").eq("user_id",user.id).maybeSingle();
+    // Get current trial status (with fallback for missing columns)
+    let profile={trial_status:"none",payment_type:"none",is_lifetime:false};
+    try{
+      const{data}=await supabase.from("user_profiles").select("trial_status,payment_type,is_lifetime").eq("user_id",user.id).maybeSingle();
+      if(data)profile=data;
+    }catch(e){console.warn("Profile fetch error:",e);}
     // If no active subscription, offer trial
     if(!profile?.is_lifetime && profile?.payment_type !== 'one_time'){
       // Check if user can start trial
@@ -6282,6 +6286,15 @@ create table user_profiles (
   user_id uuid primary key references auth.users(id) on delete cascade,
   brand jsonb default '{"company":"","tagline":"","color":"var(--amber)","logo":"🔒"}',
   plan text default 'free',
+  trial_status text default 'none',
+  trial_started_at timestamptz,
+  trial_end_at timestamptz,
+  payment_type text default 'none',
+  payment_date timestamptz,
+  subscription_id text,
+  subscription_status text default 'inactive',
+  subscription_expires_at timestamptz,
+  is_lifetime boolean default false,
   updated_at timestamptz default now()
 );
 alter table user_profiles enable row level security;
