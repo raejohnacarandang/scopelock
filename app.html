@@ -2981,10 +2981,11 @@ function App(){
   async function loadBillingHistory(){
     if(!user||isDemoMode)return;
     try{
-      const response=await fetch(`${API_BASE}/billing-history?userId=${user.id}`);
-      const data=await response.json();
-      if(data.invoices){
-        setBilling(b=>({...b,invoices:data.invoices||[]}));
+      // Direct query instead of edge function
+      const{data}=await supabase.from("payments").select("*").eq("user_id",user.id).eq("status","paid").order("created_at",{ascending:false});
+      if(data){
+        const invoices=data.map(p=>({id:p.payhip_order_id||p.id,amount:p.amount,currency:p.currency,date:p.created_at,plan:p.plan,status:p.status}));
+        setBilling(b=>({...b,invoices:invoices||[]}));
       }
     }catch(e){
       console.log("Billing history load error:",e);
@@ -4886,18 +4887,23 @@ function BillingView({plan,setPlan,user,billing,setBilling,createCheckoutSession
     if(!profile?.is_lifetime && profile?.payment_type !== 'one_time'){
       // Check if user can start trial
       if(profile?.trial_status === 'none' || profile?.trial_status === 'expired' || !profile){
-        // Start 14-day trial
+        // Start 14-day trial directly
         setBilling(b=>({...b,loading:true}));
         try{
-          const response=await fetch(`${API_BASE}/start-trial`,{
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({userId:user.id})
-          });
-          const result=await response.json();
-          if(result.error){throw new Error(result.error);}
+          const trialEnd=new Date();
+          trialEnd.setDate(trialEnd.getDate()+14);
+          const {error}=await supabase.from("user_profiles").upsert({
+            user_id:user.id,
+            trial_started_at:new Date().toISOString(),
+            trial_end_at:trialEnd.toISOString(),
+            trial_status:"active",
+            plan:"pro",
+            subscription_status:"trial"
+          },{onConflict:"user_id"});
+          if(error)throw error;
           // Reload billing after trial starts
           await loadBillingHistory();
+          setPlan("pro");
           notify("✅ 14-day Pro trial started! Complete your purchase anytime before it ends.");
         }catch(e){
           notify("❌ Error starting trial: "+e.message);
