@@ -1,0 +1,19 @@
+[functions]
+  create_checkout_session = { verify_jwt = false }
+  create_portal_session = { verify_jwt = false }
+  billing_history = { verify_jwt = false }
+  lemonsqueezy_webhook = { verify_jwt = false }
+  paymongo_webhook = { verify_jwt = false }
+  payhip_webhook = { verify_jwt = false }
+  check_subscription_expiry = { verify_jwt = false }
+  grant_subscription = { verify_jwt = false }
+
+[project]
+  project_id = "vbsvcduprffogqtvsvoy"
+
+[api]
+  enabled = true
+  port = 54321
+  schemas = ["public", "storage"]
+  extra_search_path = ["public", "extensions"]
+  max_rows = 1000

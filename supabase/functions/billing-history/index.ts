@@ -1,13 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import Stripe from "https://esm.sh/stripe@11.1.0?target=deno"
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
-  apiVersion: '2023-10-16',
-})
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || ''
+const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
 
 serve(async (req) => {
   try {
-    // Handle CORS preflight
     if (req.method === 'OPTIONS') {
       return new Response('', {
         headers: {
@@ -20,45 +18,43 @@ serve(async (req) => {
 
     const url = new URL(req.url)
     const userId = url.searchParams.get('userId')
-    const email = url.searchParams.get('email')
+    const authHeader = req.headers.get('authorization')
 
-    if (!email) {
-      return new Response(JSON.stringify({ error: 'Missing email', invoices: [] }), {
+    if (!userId) {
+      return new Response(JSON.stringify({ error: 'Missing userId', invoices: [] }), {
         status: 400,
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
       })
     }
 
-    // Find customer by email
-    const customers = await stripe.customers.list({ 
-      email, 
-      limit: 1 
-    })
+    // Use service role key to bypass RLS
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 
-    if (customers.data.length === 0) {
-      return new Response(JSON.stringify({ invoices: [] }), {
+    const { data: payments, error } = await supabase
+      .from('payments')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('status', 'paid')
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching payments:', error)
+      return new Response(JSON.stringify({ error: error.message, invoices: [] }), {
+        status: 500,
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
       })
     }
 
-    const customerId = customers.data[0].id
-
-    // Get invoices
-    const invoices = await stripe.invoices.list({
-      customer: customerId,
-      limit: 12,
-    })
-
-    const formattedInvoices = invoices.data.map(invoice => ({
-      id: invoice.number || `INV-${invoice.id}`,
-      date: new Date(invoice.created * 1000).toISOString().split('T')[0],
-      amount: (invoice.total / 100),
-      status: invoice.status || 'paid',
-      plan: invoice.lines.data[0]?.description || 'Subscription',
-      pdf: invoice.invoice_pdf,
+    const invoices = (payments || []).map(p => ({
+      id: p.payhip_order_id || p.id,
+      amount: p.amount,
+      currency: p.currency,
+      date: p.created_at,
+      plan: p.plan,
+      status: p.status,
     }))
 
-    return new Response(JSON.stringify({ invoices: formattedInvoices }), {
+    return new Response(JSON.stringify({ invoices }), {
       headers: { 
         'Content-Type': 'application/json', 
         'Access-Control-Allow-Origin': '*' 
