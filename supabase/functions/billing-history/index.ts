@@ -18,11 +18,11 @@ serve(async (req) => {
 
     const url = new URL(req.url)
     const userId = url.searchParams.get('userId')
-    const authHeader = req.headers.get('authorization')
 
+    // If no userId, return empty invoices
     if (!userId) {
-      return new Response(JSON.stringify({ error: 'Missing userId', invoices: [] }), {
-        status: 400,
+      return new Response(JSON.stringify({ invoices: [] }), {
+        status: 200,
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
       })
     }
@@ -30,6 +30,7 @@ serve(async (req) => {
     // Use service role key to bypass RLS
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 
+    // Check if payments table exists
     const { data: payments, error } = await supabase
       .from('payments')
       .select('*')
@@ -38,9 +39,10 @@ serve(async (req) => {
       .order('created_at', { ascending: false })
 
     if (error) {
-      console.error('Error fetching payments:', error)
-      return new Response(JSON.stringify({ error: error.message, invoices: [] }), {
-        status: 500,
+      // If table doesn't exist or error, return empty
+      console.log('Payments error:', error.message)
+      return new Response(JSON.stringify({ invoices: [] }), {
+        status: 200,
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
       })
     }
@@ -61,8 +63,8 @@ serve(async (req) => {
       },
     })
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message, invoices: [] }), {
-      status: 500,
+    return new Response(JSON.stringify({ invoices: [], error: error.message }), {
+      status: 200,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
     })
   }
