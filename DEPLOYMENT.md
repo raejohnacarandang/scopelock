@@ -1,47 +1,47 @@
-# ScopeLock Billing - Deployment Guide
+# ScopeLock Billing - Deployment Guide (Payhip)
 
 ## Prerequisites
 
 1. **Supabase Project** - Create at supabase.com
-2. **Stripe Account** - Create at stripe.com
+2. **Payhip Account** - Create at payhip.com
 3. **Supabase CLI** - Install: `npm install -g supabase`
 
 ---
 
-## Step 1: Setup Stripe
+## Step 1: Setup Payhip Products
 
-1. Go to [Stripe Dashboard](https://dashboard.stripe.com)
-2. Create your account (or sign in)
-3. Go to **Developers → API Keys**
-4. Copy your **Secret Key** (starts with `sk_test_`)
-
----
-
-## Step 2: Create Stripe Products
-
-1. Go to **Products** in Stripe Dashboard
+1. Go to [Payhip Dashboard](https://payhip.com/dashboard)
 2. Create 2 products:
 
-### Pro Plan ($9/month)
+### Pro Plan ($9 - one-time)
 - Name: "ScopeLock Pro"
-- Price: $9.00/month (recurring)
-- Copy the **Price ID** (starts with `price_`)
+- Price: $9.00
+- Copy the product link or ID
 
-### Business Plan ($19/month)
-- Name: "ScopeLock Business"  
-- Price: $19.00/month (recurring)
-- Copy the **Price ID**
+### Business Plan ($19 - one-time)
+- Name: "ScopeLock Business"
+- Price: $19.00
+- Copy the product link or ID
 
 ---
 
-## Step 3: Set Environment Variables
+## Step 2: Update app.html
 
-1. Go to [Supabase Dashboard](https://supabase.com/dashboard)
-2. Select your project
-3. Go to **Settings → Edge Functions**
-4. Add new secret:
-   - Key: `STRIPE_SECRET_KEY`
-   - Value: Your Stripe secret key (sk_test_xxx)
+In `app.html`, update the Payhip product IDs:
+
+```javascript
+const PAYHIP_PRODUCTS={pro:"YOUR_PRO_PRODUCT_ID",biz:"YOUR_BIZ_PRODUCT_ID"};
+```
+
+Find these in your Payhip product URLs: `payhip.com/b/YOUR_PRODUCT_ID`
+
+---
+
+## Step 3: Set Webhook in Payhip
+
+1. Payhip Dashboard → Settings → Webhooks
+2. Add webhook URL: `https://YOUR_SUPABASE_PROJECT.supabase.co/functions/v1/payhip-webhook`
+3. Events to listen: `subscription.created`, `subscription.deleted`, `paid`, `refunded`
 
 ---
 
@@ -55,25 +55,18 @@ supabase login
 cd supabase
 supabase link --project-ref YOUR_PROJECT_REF
 
-# Deploy all functions
-supabase functions deploy create-checkout-session
-supabase functions deploy create-portal-session  
+# Deploy functions
+supabase functions deploy payhip-webhook
 supabase functions deploy billing-history
 ```
 
-To get your project ref: Supabase Dashboard → Settings → General → Project Ref
-
 ---
 
-## Step 5: Update app.html
+## Step 5: Set Environment Variables
 
-In `app.html`, find line ~3791 and replace `YOUR_PROJECT` with your actual Supabase project ref:
+In Supabase Dashboard → Settings → Edge Functions:
 
-```javascript
-const API_BASE="https://abc123.supabase.co/functions/v1";
-```
-
-Get your URL from: Supabase Dashboard → Settings → API → Project URL
+- `PAHIP_WEBHOOK_SECRET` - Get from Payhip webhook settings
 
 ---
 
@@ -81,50 +74,34 @@ Get your URL from: Supabase Dashboard → Settings → API → Project URL
 
 1. Open your app
 2. Go to **Billing** tab
-3. Click **Switch to Pro** or **Switch to Business**
-4. Should redirect to Stripe Checkout
+3. Click **Start Pro** or **Go Business**
+4. Should redirect to Payhip checkout
 5. Complete payment
 6. Should redirect back with success
 
 ---
 
-## Troubleshooting
-
-### CORS Errors
-- Ensure functions have `verify_jwt: false` in config
-- Check function logs in Supabase Dashboard → Edge Functions
-
-### Stripe Errors
-- Verify STRIPE_SECRET_KEY is set correctly
-- Check Price IDs match your Stripe products
-
-### Payment Not Working
-- Use Stripe test cards:
-  - Success: 4242 4242 4242 4242
-  - Decline: 4000 0000 0000 0002
-
----
-
-## Files Created
+## Files
 
 ```
 supabase/
-├── config.toml                    # Edge function config
+├── config.toml
 └── functions/
-    ├── create-checkout-session/
-    │   └── index.ts              # Creates Stripe checkout
-    ├── create-portal-session/
-    │   └── index.ts              # Opens billing portal
+    ├── payhip-webhook/
+    │   └── index.ts    # Handles Payhip payments
     └── billing-history/
-        └── index.ts               # Gets invoice history
+        └── index.ts    # Gets invoice history
 ```
 
 ---
 
-## Production Notes
+## Troubleshooting
 
-1. **Enable JWT verification** in production (update config)
-2. **Set up webhook** for subscription events
-3. **Store customer IDs** in your database
-4. **Add webhook signature verification**
-5. Use Stripe **live keys** (sk_live_xxx) in production
+### Payment not working
+- Verify Payhip product IDs are correct
+- Check webhook is set in Payhip dashboard
+- Check function logs in Supabase Edge Functions
+
+### CORS Errors
+- Ensure `verify_jwt: false` in supabase.toml
+- Check function logs in Supabase Dashboard
