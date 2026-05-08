@@ -2679,15 +2679,8 @@ function App(){
     if(error){console.warn("user_profiles:",error.message);return;}
     if(data){
       setBrand(data.brand||{company:"",tagline:"",color:"var(--amber)",logo:"🔒",currency:"USD",email:"",phone:"",address:"",defaultRate:0,invoiceFooter:"Thank you for your business.",shareWelcome:""});
-      // Check if user is Pro (via plan OR active trial)
-      const isPro = data.plan === 'pro' || data.plan === 'biz';
-      const isOnTrial = data.trial_status === 'active';
-      const effectivePlan = isOnTrial ? 'pro' : (data.plan || 'free');
-      setPlan(effectivePlan);
-      // Store trial info for UI
-      if(isOnTrial && data.trial_end_at){
-        window.__trialEndAt = data.trial_end_at;
-      }
+      // Set effective plan
+      setPlan(data.plan || 'free');
     }
   }
 
@@ -2790,7 +2783,7 @@ function App(){
       notify(`⚠️ ${plan} plan limit. Upgrade to unlock more.`);
       setConfirmAction({
         title:"Upgrade to Pro?",
-        msg:"You'll get a 14-day free trial with unlimited projects and invoice generation!",
+        msg:"Upgrade to Pro for unlimited projects and invoice generation!",
         confirmLabel:"Upgrade",
         confirmColor:"var(--primary)",
         onConfirm:()=>setView("settings")
@@ -2981,11 +2974,13 @@ function App(){
   async function loadBillingHistory(){
     if(!user||isDemoMode)return;
     try{
-      // Direct query instead of edge function
       const{data}=await supabase.from("payments").select("*").eq("user_id",user.id).eq("status","paid").order("created_at",{ascending:false});
-      if(data){
+      if(data && data.length > 0){
         const invoices=data.map(p=>({id:p.payhip_order_id||p.id,amount:p.amount,currency:p.currency,date:p.created_at,plan:p.plan,status:p.status}));
         setBilling(b=>({...b,invoices:invoices||[]}));
+        const paidPlans=data.map(p=>p.plan).filter(Boolean);
+        if(paidPlans.some(p=>p==="biz"||p==="business"))setPlan("biz");
+        else if(paidPlans.some(p=>p==="pro"))setPlan("pro");
       }
     }catch(e){
       console.log("Billing history load error:",e);
@@ -4815,7 +4810,7 @@ function App(){
             <div style={{display:"grid",gap:16}}>
               <div className="card" style={{padding:24}}>
                 <h3 style={{fontSize:15,fontWeight:600,marginBottom:16,display:"flex",alignItems:"center",gap:8}}><Icon name="Card" size={16} color="var(--teal)"/> Billing & Plans</h3>
-                <BillingView plan={plan} setPlan={p=>{setPlan(p);notify(`✅ Switched to ${p} plan`);}} user={user} billing={billing} setBilling={setBilling} createCheckoutSession={createCheckoutSession} loadBillingHistory={loadBillingHistory} isDemoMode={isDemoMode} notify={notify} trialEndAt={window.__trialEndAt} API_BASE={API_BASE}/>
+                <BillingView plan={plan} setPlan={p=>{setPlan(p);notify(`✅ Switched to ${p} plan`);}} user={user} billing={billing} setBilling={setBilling} createCheckoutSession={createCheckoutSession} loadBillingHistory={loadBillingHistory} isDemoMode={isDemoMode} notify={notify} API_BASE={API_BASE}/>
               </div>
               <div className="card" style={{padding:24}}>
                 <h3 style={{fontSize:15,fontWeight:600,marginBottom:16,display:"flex",alignItems:"center",gap:8}}><Icon name="Palette" size={16} color="var(--primary)"/> Branding</h3>
@@ -4849,7 +4844,7 @@ function App(){
 }
 
 
-function BillingView({plan,setPlan,user,billing,setBilling,createCheckoutSession,loadBillingHistory,isDemoMode,notify,trialEndAt,API_BASE}){
+function BillingView({plan,setPlan,user,billing,setBilling,createCheckoutSession,loadBillingHistory,isDemoMode,notify,API_BASE}){
   const [billingTab,setBillingTab]=React.useState("plans");
   const [showAddCard,setShowAddCard]=React.useState(false);
   const [processing,setProcessing]=React.useState(false);
@@ -4877,43 +4872,6 @@ function BillingView({plan,setPlan,user,billing,setBilling,createCheckoutSession
   const handleSubscribe=async(priceId)=>{
     if(isDemoMode){notify("Demo mode - upgrade works in real account");setPlan(priceId==="price_pro_monthly"?"pro":"biz");return;}
     if(!user){notify("Please sign in first");return;}
-    // Get current trial status (with fallback for missing columns)
-    let profile={trial_status:"none",payment_type:"none",is_lifetime:false};
-    try{
-      const{data}=await supabase.from("user_profiles").select("trial_status,payment_type,is_lifetime").eq("user_id",user.id).maybeSingle();
-      if(data)profile=data;
-    }catch(e){console.warn("Profile fetch error:",e);}
-    // If no active subscription, offer trial
-    if(!profile?.is_lifetime && profile?.payment_type !== 'one_time'){
-      // Check if user can start trial
-      if(profile?.trial_status === 'none' || profile?.trial_status === 'expired' || !profile){
-        // Start 14-day trial directly
-        setBilling(b=>({...b,loading:true}));
-        try{
-          const trialEnd=new Date();
-          trialEnd.setDate(trialEnd.getDate()+14);
-          const {error}=await supabase.from("user_profiles").upsert({
-            user_id:user.id,
-            trial_started_at:new Date().toISOString(),
-            trial_end_at:trialEnd.toISOString(),
-            trial_status:"active",
-            plan:"pro",
-            subscription_status:"trial"
-          },{onConflict:"user_id"});
-          if(error)throw error;
-          // Reload billing after trial starts
-          await loadBillingHistory();
-          setPlan("pro");
-          notify("✅ 14-day Pro trial started! Complete your purchase anytime before it ends.");
-        }catch(e){
-          notify("❌ Error starting trial: "+e.message);
-        }finally{
-          setBilling(b=>({...b,loading:false}));
-        }
-        return;
-      }
-    }
-    // User already has trial or subscription - go to checkout
     await createCheckoutSession(priceId);
   };
   
@@ -4988,8 +4946,8 @@ function BillingView({plan,setPlan,user,billing,setBilling,createCheckoutSession
                 {p.features.map(f=><li key={f} style={{fontSize:13,display:"flex",gap:8,alignItems:"flex-start",marginBottom:8}}><span style={{color:"#22c55e",fontSize:12,flexShrink:0}}>✓</span><span style={{color:"var(--text)"}}>{f}</span></li>)}
               </ul>
               {p.id==="free"?plan===p.id?<div style={{background:"rgba(34,197,94,0.08)",border:"1px solid rgba(34,197,94,0.25)",color:"#22c55e",borderRadius:8,padding:10,textAlign:"center",fontSize:13,fontWeight:500}}>✓ Current Plan</div>:<button onClick={()=>setPlan("free")} className="btn-g" style={{width:"100%",padding:10,fontSize:11}}>Go Free</button>:
-              <button onClick={()=>handleSubscribe(p.priceId)} className={(plan===p.id || trialEndAt)?"btn-g":"btn-p"} style={{width:"100%",padding:10,fontSize:11}} disabled={billing.loading}>
-                {billing.loading?"Loading...":trialEndAt?`Active (${Math.ceil((new Date(trialEndAt)-new Date())/(864e5))} days left)`:plan===p.id?"✓ Active":p.id==="pro"?"Start 14-Day Pro Trial":"Go Business"}
+              <button onClick={()=>handleSubscribe(p.priceId)} className={plan===p.id?"btn-g":"btn-p"} style={{width:"100%",padding:10,fontSize:11}} disabled={billing.loading}>
+                {billing.loading?"Loading...":plan===p.id?"✓ Active":p.id==="pro"?"Start Pro":"Go Business"}
               </button>}
             </div>)})}
           </div>
@@ -5021,7 +4979,7 @@ function BillingView({plan,setPlan,user,billing,setBilling,createCheckoutSession
           <div style={{marginTop:24,padding:"20px 24px",background:"rgba(34,197,94,0.05)",border:"1px solid rgba(34,197,94,0.15)",borderRadius:12}}>
             <div style={{fontSize:12,letterSpacing:"0.1em",textTransform:"uppercase",color:"#22c55e",fontWeight:600,marginBottom:12}}>Risk-Free Guarantee</div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-              {["14-day free trial","No credit card required","Cancel anytime","30-day money-back refund"].map(item=>(
+              {["No credit card required","Cancel anytime","30-day money-back refund"].map(item=>(
                 <div key={item} style={{display:"flex",alignItems:"center",gap:8,fontSize:13,color:"var(--text)"}}>
                   <span style={{color:"#22c55e"}}>✓</span>{item}
                 </div>
