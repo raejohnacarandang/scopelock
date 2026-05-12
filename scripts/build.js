@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 /**
- * ScopeLock Production Build Script
- * Transpiles JSX from temp_code.js to browser-compatible JS (no runtime imports)
- * 
- * Usage: node scripts/build.js
+ * Build production files:
+ * 1. dist/app.min.js - compiled from temp_code.js (no JSX runtime needed in browser)
+ * 2. dist/index.html - loads compiled JS via <script src> (no babel-standalone)
  */
 
 const fs = require('fs');
@@ -14,59 +13,46 @@ const TEMP_CODE = path.join(ROOT, 'temp_code.js');
 const APP_HTML = path.join(ROOT, 'app.html');
 const DIST = path.join(ROOT, 'dist');
 
-if (!fs.existsSync(DIST)) {
-  fs.mkdirSync(DIST, { recursive: true });
-}
-
-if (!fs.existsSync(TEMP_CODE)) {
-  console.error('Error: temp_code.js not found');
-  process.exit(1);
-}
+if (!fs.existsSync(DIST)) fs.mkdirSync(DIST, { recursive: true });
+if (!fs.existsSync(TEMP_CODE)) { console.error('temp_code.js not found'); process.exit(1); }
 
 const jsCode = fs.readFileSync(TEMP_CODE, 'utf8');
 console.log('Source: temp_code.js (' + (jsCode.length / 1024).toFixed(1) + ' KB)');
 
 const babel = require('@babel/core');
-
-// Transform with classic JSX runtime (no import statements needed)
 const result = babel.transformSync(jsCode, {
-  presets: [
-    ['@babel/preset-react', {
-      runtime: 'classic',
-      pragma: 'React.createElement',
-      pragmaFrag: 'React.Fragment',
-      throwIfNamespace: false,
-      development: false,
-      useBuiltIns: false
-    }]
-  ],
+  presets: [['@babel/preset-react', { runtime: 'classic', pragma: 'React.createElement', pragmaFrag: 'React.Fragment' }]],
   filename: 'app.jsx',
-  sourceMaps: false,
   minified: true
 });
 
-fs.writeFileSync(path.join(DIST, 'app.js'), result.code);
 fs.writeFileSync(path.join(DIST, 'app.min.js'), result.code);
-console.log('Compiled to dist/app.js (' + (result.code.length / 1024).toFixed(1) + ' KB)');
+console.log('Compiled: dist/app.min.js (' + (result.code.length / 1024).toFixed(1) + ' KB)');
 
+// Build index.html that loads the compiled JS (no babel needed)
 const appHtml = fs.readFileSync(APP_HTML, 'utf8');
 const scriptStart = appHtml.indexOf('<script type="text/babel">');
 const scriptEnd = appHtml.indexOf('</script>', scriptStart);
 
-if (scriptStart === -1) {
-  console.error('Error: Could not find babel script tag in app.html');
-  process.exit(1);
-}
+if (scriptStart === -1) { console.error('No babel script tag'); process.exit(1); }
 
-const header = appHtml.substring(0, scriptStart + '<script type="text/babel">\n'.length);
-const footer = '\n</script>\n' + appHtml.substring(scriptEnd + '</script>'.length);
+// Replace <script type="text/babel"> with <script src="app.min.js">
+const prodHtml = appHtml.substring(0, scriptStart) +
+  '<script src="app.min.js">' +
+  appHtml.substring(scriptEnd + '</script>'.length);
 
-const prodHtml = header + '\n' + result.code + footer;
 fs.writeFileSync(path.join(DIST, 'index.html'), prodHtml);
-console.log('Production HTML written to dist/index.html');
 
-console.log('\nBuild complete! Files in dist/:');
+// Also update app.html to use precompiled version (no babel)
+const updatedAppHtml = appHtml.substring(0, scriptStart) +
+  '<script>\n' + result.code + '\n</script>' +
+  appHtml.substring(scriptEnd + '</script>'.length);
+
+fs.writeFileSync(APP_HTML, updatedAppHtml);
+console.log('Updated app.html with pre-compiled code (no babel-standalone)');
+
+console.log('\nBuild complete!');
 fs.readdirSync(DIST).forEach(f => {
   const size = fs.statSync(path.join(DIST, f)).size;
-  console.log('  - ' + f + ' (' + (size / 1024).toFixed(1) + ' KB)');
+  console.log('  dist/' + f + ' (' + (size / 1024).toFixed(1) + ' KB)');
 });
