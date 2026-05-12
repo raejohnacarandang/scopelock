@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 /**
- * Build production files:
- * 1. dist/app.min.js - compiled from temp_code.js (no JSX runtime needed in browser)
- * 2. dist/index.html - loads compiled JS via <script src> (no babel-standalone)
+ * Build production files with external JS file (no inline script escaping issues)
  */
 
 const fs = require('fs');
@@ -29,27 +27,28 @@ const result = babel.transformSync(jsCode, {
 fs.writeFileSync(path.join(DIST, 'app.min.js'), result.code);
 console.log('Compiled: dist/app.min.js (' + (result.code.length / 1024).toFixed(1) + ' KB)');
 
-// Build index.html that loads the compiled JS (no babel needed)
+// For dist/index.html: use external script file
 const appHtml = fs.readFileSync(APP_HTML, 'utf8');
-const scriptStart = appHtml.indexOf('<script type="text/babel">');
+let scriptStart = appHtml.indexOf('<script type="text/babel">');
+if (scriptStart === -1) scriptStart = appHtml.indexOf('<script>');
 const scriptEnd = appHtml.indexOf('</script>', scriptStart);
 
-if (scriptStart === -1) { console.error('No babel script tag'); process.exit(1); }
+if (scriptStart === -1) { console.error('No script tag found'); process.exit(1); }
 
-// Replace <script type="text/babel"> with <script src="app.min.js">
+// dist/index.html: load app.min.js as external script (no escaping needed)
+const distHtml = appHtml.substring(0, scriptStart) +
+  '<script src="app.min.js"><\/script>' +
+  appHtml.substring(scriptEnd + '</script>'.length);
+fs.writeFileSync(path.join(DIST, 'index.html'), distHtml);
+console.log('dist/index.html uses external app.min.js');
+
+// For app.html (single-file deployment): inline with escaped </script>
+const escapedCode = result.code.replace(/<\/script>/gi, '<\\/script>');
 const prodHtml = appHtml.substring(0, scriptStart) +
-  '<script src="app.min.js">' +
+  '<script>' + escapedCode + '</script>' +
   appHtml.substring(scriptEnd + '</script>'.length);
-
-fs.writeFileSync(path.join(DIST, 'index.html'), prodHtml);
-
-// Also update app.html to use precompiled version (no babel)
-const updatedAppHtml = appHtml.substring(0, scriptStart) +
-  '<script>\n' + result.code + '\n</script>' +
-  appHtml.substring(scriptEnd + '</script>'.length);
-
-fs.writeFileSync(APP_HTML, updatedAppHtml);
-console.log('Updated app.html with pre-compiled code (no babel-standalone)');
+fs.writeFileSync(APP_HTML, prodHtml);
+console.log('Updated app.html (inline with escaped </script>)');
 
 console.log('\nBuild complete!');
 fs.readdirSync(DIST).forEach(f => {
