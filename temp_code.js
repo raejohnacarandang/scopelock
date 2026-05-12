@@ -2362,8 +2362,6 @@ function ReadOnlyView({data}){
 
   useEffect(()=>{
     if(!id){setLoading(false);return;}
-    // For client view, use local data only - no Supabase needed
-    // This allows offline viewing without authentication
     if(!isConfigured){
       setProj(data.project);
       setLoading(false);
