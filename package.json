@@ -4,7 +4,10 @@
     "@capacitor/core": "^8.2.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.28.6",
+    "@babel/core": "^7.29.0",
     "@babel/parser": "^7.29.2",
+    "@babel/preset-react": "^7.28.5",
     "@babel/traverse": "^7.29.0",
     "@babel/types": "^7.29.0",
     "electron": "^41.0.3"
