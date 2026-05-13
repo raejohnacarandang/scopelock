@@ -29,11 +29,13 @@ console.log('Compiled: dist/app.min.js (' + (result.code.length / 1024).toFixed(
 
 // For dist/index.html: use external script file
 const appHtml = fs.readFileSync(APP_HTML, 'utf8');
-let scriptStart = appHtml.indexOf('<script type="text/babel">');
-if (scriptStart === -1) scriptStart = appHtml.indexOf('<script>');
+// Find the inline script (after <div id="root"></div>)
+const rootIdx = appHtml.indexOf('<div id="root"></div>');
+if (rootIdx === -1) { console.error('No root div found'); process.exit(1); }
+let scriptStart = appHtml.indexOf('<script', rootIdx);
+if (scriptStart === -1) { console.error('No inline script found'); process.exit(1); }
 const scriptEnd = appHtml.indexOf('</script>', scriptStart);
-
-if (scriptStart === -1) { console.error('No script tag found'); process.exit(1); }
+if (scriptEnd === -1) { console.error('No closing script tag found'); process.exit(1); }
 
 // dist/index.html: load app.min.js as external script (no escaping needed)
 const distHtml = appHtml.substring(0, scriptStart) +
