@@ -1,0 +1,2107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>ScopeLock — Stop Scope Creep Before It Starts</title>
+  <meta name="theme-color" content="#7C3AED"/>
+  <meta name="description" content="Stop scope creep before it starts."/>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <!-- Supabase JS v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@700;800&display=swap');
+    :root{
+      --bg:#080B18;
+      --surface:#0E1225;
+      --surface2:#131729;
+      --surface3:#1A1F38;
+      --border:#1E2440;
+      --border-glow:#2A3260;
+      --text:#E4EBF8;
+      --muted:#5B6B9A;
+      --muted2:#7B8EC0;
+      --amber:#00F5D4;
+      --primary:#7C3AED;
+      --primary2:#9D5CF6;
+      --primary-glow:rgba(124,58,237,0.3);
+      --teal:#00F5D4;
+      --teal2:#00D4B4;
+      --teal-glow:rgba(0,245,212,0.18);
+      --cyan:#06B6D4;
+      --green:#00E5A0;
+      --red:#F1416C;
+      --orange:#FF8C42;
+      --blue:#818CF8;
+      --grad1:linear-gradient(135deg,#7C3AED,#00F5D4);
+      --grad2:linear-gradient(135deg,#7C3AED,#9D5CF6);
+    }
+    .light{
+      --bg:#F0F4FF;--surface:#FFFFFF;--surface2:#E8EEFF;--surface3:#DDE5FF;
+      --border:#C7D2FE;--border-glow:#A5B4FC;
+      --text:#1E1B4B;--muted:#6366F1;--muted2:#4F46E5;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;transition:background 0.2s,color 0.2s;line-height:1.5;}
+    ::-webkit-scrollbar{width:4px;}
+    ::-webkit-scrollbar-track{background:var(--surface);}
+    ::-webkit-scrollbar-thumb{background:linear-gradient(var(--primary),var(--teal));border-radius:4px;}
+
+    /* ── Inputs ── */
+    input,textarea,select{
+      background:var(--surface2);color:var(--text);
+      border:1px solid var(--border);border-radius:10px;
+      padding:10px 14px;font-family:'JetBrains Mono',monospace;font-size:13px;
+      outline:none;width:100%;transition:border-color 0.2s,box-shadow 0.2s,background 0.2s;
+    }
+    input:focus,textarea:focus,select:focus{
+      border-color:var(--teal);
+      box-shadow:0 0 0 3px var(--teal-glow),0 0 20px rgba(0,245,212,0.06);
+      background:var(--surface3);
+    }
+    textarea{resize:vertical;min-height:80px;}
+    select option{background:var(--surface2);}
+
+    /* ── Buttons ── */
+    button{cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.18s;letter-spacing:0.02em;}
+    .btn-p{
+      background:linear-gradient(135deg,var(--primary),var(--primary2));
+      color:#fff;border:none;padding:10px 20px;border-radius:10px;
+      font-size:12px;font-weight:700;letter-spacing:0.05em;
+      box-shadow:0 0 20px var(--primary-glow),0 2px 8px rgba(0,0,0,0.4);
+      position:relative;overflow:hidden;
+    }
+    .btn-p::after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(255,255,255,0.08));pointer-events:none;}
+    .btn-p:hover{filter:brightness(1.2);box-shadow:0 0 32px var(--primary-glow),0 4px 16px rgba(0,0,0,0.5);transform:translateY(-1px);}
+    .btn-p:disabled{opacity:0.45;cursor:not-allowed;filter:none;box-shadow:none;transform:none;}
+    .btn-g{
+      background:rgba(255,255,255,0.03);color:var(--muted2);
+      border:1px solid var(--border);padding:8px 15px;border-radius:9px;font-size:11px;font-weight:500;
+      backdrop-filter:blur(4px);
+    }
+    .btn-g:hover{border-color:var(--teal);color:var(--teal);background:rgba(0,245,212,0.05);box-shadow:0 0 12px var(--teal-glow);}
+    .btn-g:disabled{opacity:0.35;cursor:not-allowed;}
+    .btn-ok{
+      background:rgba(0,245,212,0.1);color:var(--teal);
+      border:1px solid rgba(0,245,212,0.3);padding:5px 13px;border-radius:7px;font-size:11px;font-weight:700;
+    }
+    .btn-ok:hover{background:var(--teal);color:#060B18;box-shadow:0 0 16px var(--teal-glow);}
+    .btn-no{
+      background:rgba(241,65,108,0.08);color:var(--red);
+      border:1px solid rgba(241,65,108,0.25);padding:5px 13px;border-radius:7px;font-size:11px;font-weight:700;
+    }
+    .btn-no:hover{background:var(--red);color:#fff;box-shadow:0 0 16px rgba(241,65,108,0.3);}
+
+    /* ── Cards ── */
+    .card{
+      background:var(--surface);
+      border:1px solid var(--border);border-radius:14px;
+      transition:border-color 0.2s,box-shadow 0.2s,transform 0.15s;
+      position:relative;overflow:hidden;
+    }
+    .card::before{
+      content:"";position:absolute;inset:0;
+      background:linear-gradient(135deg,rgba(124,58,237,0.03) 0%,transparent 60%);
+      pointer-events:none;border-radius:inherit;
+    }
+    .card:hover{
+      border-color:var(--border-glow);
+      box-shadow:0 4px 24px rgba(0,0,0,0.3),0 0 0 1px rgba(124,58,237,0.08);
+    }
+
+    /* ── Fade animation ── */
+    .fade{animation:fadeIn 0.2s ease;}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+    /* ── Labels ── */
+    .lbl{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;font-weight:600;}
+
+    /* ── Modal ── */
+    .modal-bg{
+      position:fixed;inset:0;background:rgba(4,6,18,0.88);
+      z-index:300;display:flex;align-items:center;justify-content:center;padding:16px;
+      backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    }
+    .modal{
+      background:var(--surface);border:1px solid var(--border);border-radius:18px;
+      padding:26px;max-width:540px;width:100%;max-height:88vh;overflow-y:auto;
+      box-shadow:0 32px 80px rgba(0,0,0,0.7),0 0 0 1px rgba(124,58,237,0.12),0 0 60px rgba(124,58,237,0.06);
+    }
+
+    /* ── Progress bar ── */
+    .dbar{height:4px;background:var(--surface3);border-radius:4px;overflow:hidden;margin-top:7px;}
+
+    /* ── Tooltip ── */
+    .tip{position:relative;display:inline-block;}
+    .tip-box{
+      display:none;position:absolute;top:110%;left:0;
+      background:var(--surface3);border:1px solid var(--primary);
+      border-radius:10px;padding:10px 14px;font-size:11px;color:var(--text);
+      width:240px;z-index:50;line-height:1.7;
+      box-shadow:0 8px 32px rgba(0,0,0,0.5),0 0 20px var(--primary-glow);
+    }
+    .tip:hover .tip-box{display:block;}
+
+    /* ── Tags ── */
+    .tag-u{
+      background:rgba(241,65,108,0.1);color:var(--red);
+      border:1px solid rgba(241,65,108,0.25);font-size:9px;padding:2px 8px;
+      border-radius:5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;
+    }
+    .tag-n{
+      background:var(--surface2);color:var(--muted);border:1px solid var(--border);
+      font-size:9px;padding:2px 8px;border-radius:5px;letter-spacing:0.04em;
+    }
+
+    /* ── Nav links ── */
+    .nav-link{color:var(--muted);font-size:11px;background:transparent;border:none;padding:5px 10px;border-radius:6px;font-weight:500;}
+    .nav-link:hover,.nav-link.active{color:var(--teal);background:rgba(0,245,212,0.06);}
+
+    /* ── Keyboard badge ── */
+    .kbd{background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:2px 7px;font-size:10px;color:var(--muted);}
+
+    /* ── Health ring ── */
+    .health-ring{display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;font-size:13px;font-weight:800;box-shadow:0 0 20px currentColor;}
+
+    /* ── Undo bar ── */
+    .undo-bar{
+      position:fixed;bottom:28px;left:50%;transform:translateX(-50%);
+      background:var(--surface);border:1px solid var(--primary);border-radius:14px;
+      padding:13px 22px;display:flex;align-items:center;gap:14px;
+      z-index:500;font-size:12px;
+      box-shadow:0 8px 40px rgba(0,0,0,0.6),0 0 32px var(--primary-glow);
+      animation:slideUp 0.2s ease;backdrop-filter:blur(12px);
+    }
+    @keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(14px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+    .undo-progress{position:absolute;bottom:0;left:0;height:3px;background:var(--grad1);border-radius:0 0 14px 14px;animation:shrink 5s linear forwards;}
+    @keyframes shrink{from{width:100%}to{width:0%}}
+
+    /* ── Checkbox ── */
+    .cr-check{
+      width:17px;height:17px;border-radius:5px;border:1px solid var(--border);
+      background:var(--surface2);cursor:pointer;
+      display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;
+    }
+    .cr-check.checked{background:var(--grad1);border-color:var(--teal);box-shadow:0 0 10px var(--teal-glow);}
+
+    /* ── Audit log ── */
+    .audit-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+    .audit-line{position:absolute;left:3px;top:12px;bottom:0;width:2px;background:linear-gradient(to bottom,var(--primary),transparent);}
+
+    /* ── Header glow ── */
+    header{box-shadow:0 1px 0 var(--border),0 4px 40px rgba(124,58,237,0.08);}
+
+    /* ── Auth ── */
+    input.error-field{border-color:var(--red)!important;box-shadow:0 0 0 3px rgba(241,65,108,0.15)!important;}
+    .btn-google{
+      background:var(--surface2);color:var(--text);border:1px solid var(--border);
+      padding:11px 18px;border-radius:10px;font-size:12px;font-weight:600;
+      display:flex;align-items:center;justify-content:center;gap:10px;width:100%;
+      transition:all 0.18s;
+    }
+    .btn-google:hover{border-color:var(--teal);box-shadow:0 0 16px var(--teal-glow);background:rgba(0,245,212,0.04);}
+    .err-msg{color:var(--red);font-size:11px;margin-top:5px;display:flex;align-items:center;gap:5px;}
+    .success-msg{color:var(--teal);font-size:11px;margin-top:5px;display:flex;align-items:center;gap:5px;}
+    .divider{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--muted);font-size:11px;}
+    .divider::before,.divider::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);}
+
+    /* ── Spinners ── */
+    .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.12);border-top-color:var(--teal);border-radius:50%;animation:spin 0.7s linear infinite;}
+    .spinner-dark{border-color:rgba(0,0,0,0.15);border-top-color:#000;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* ── Loading ── */
+    .loading-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;}
+    .skeleton{background:linear-gradient(90deg,var(--surface) 25%,var(--surface2) 50%,var(--surface) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:8px;}
+    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    .skeleton-card{height:88px;margin-bottom:12px;}
+    .skeleton-title{height:16px;width:55%;margin-bottom:10px;}
+    .skeleton-line{height:11px;width:75%;}
+    .config-banner{
+      background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);
+      border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:12px;
+      color:var(--blue);line-height:1.9;
+    }
+    .config-banner code{background:var(--surface2);padding:2px 7px;border-radius:5px;font-size:11px;color:var(--teal);}
+
+    /* ── Pill ── */
+    .pill{
+      display:inline-flex;align-items:center;gap:5px;
+      background:rgba(255,255,255,0.03);border:1px solid var(--border);
+      border-radius:100px;padding:4px 12px;font-size:11px;color:var(--muted2);
+      backdrop-filter:blur(4px);
+    }
+
+    /* ── Stats grid ── */
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+
+    /* ── Sidebar layout ── */
+    .app-shell{display:flex;min-height:100vh;}
+    .sidebar{
+      width:240px;flex-shrink:0;background:var(--surface);
+      border-right:1px solid var(--border);
+      display:flex;flex-direction:column;
+      position:fixed;top:0;left:0;bottom:0;z-index:200;
+    }
+    .sidebar-header{
+      padding:18px 18px 14px;border-bottom:1px solid var(--border);
+      display:flex;align-items:center;gap:10px;
+    }
+    .sidebar-section{padding:10px 20px 4px;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+    .sidebar-item{
+      display:flex;align-items:center;gap:9px;
+      padding:8px 12px;margin:1px 8px;border-radius:8px;
+      font-size:12px;font-weight:500;color:var(--muted2);
+      background:transparent;border:none;width:calc(100% - 16px);
+      text-align:left;cursor:pointer;transition:all 0.15s;position:relative;
+    }
+    .sidebar-item:hover{background:rgba(255,255,255,0.04);color:var(--text);}
+    .sidebar-item.active{background:rgba(0,245,212,0.07);color:var(--teal);font-weight:600;}
+    .sidebar-item.active::before{
+      content:"";position:absolute;left:-8px;top:50%;transform:translateY(-50%);
+      width:3px;height:55%;background:var(--teal);border-radius:0 3px 3px 0;
+    }
+    .sidebar-item .s-icon{width:18px;text-align:center;font-size:13px;flex-shrink:0;}
+    .sidebar-item .s-badge{
+      margin-left:auto;background:rgba(241,65,108,0.12);color:var(--red);
+      border:1px solid rgba(241,65,108,0.25);border-radius:100px;
+      padding:1px 7px;font-size:10px;font-weight:700;
+    }
+    .sidebar-footer{padding:12px 8px;border-top:1px solid var(--border);}
+    .sidebar-user{
+      display:flex;align-items:center;gap:10px;padding:9px 10px;
+      border-radius:10px;cursor:pointer;transition:background 0.15s;
+    }
+    .sidebar-user:hover{background:rgba(255,255,255,0.04);}
+    .sidebar-avatar{
+      width:32px;height:32px;border-radius:50%;
+      background:linear-gradient(135deg,var(--primary),var(--teal));
+      display:flex;align-items:center;justify-content:center;
+      font-size:13px;font-weight:700;color:#fff;flex-shrink:0;
+    }
+    .main-content{margin-left:240px;flex:1;display:flex;flex-direction:column;min-height:100vh;}
+    .topbar{
+      height:52px;background:rgba(8,11,24,0.92);border-bottom:1px solid var(--border);
+      padding:0 28px;display:flex;align-items:center;justify-content:space-between;
+      position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);flex-shrink:0;
+    }
+    @media(max-width:768px){
+      .sidebar{display:none;}
+      .sidebar.mobile-open{display:flex;position:fixed;z-index:200;top:0;left:0;bottom:0;width:260px;box-shadow:4px 0 32px rgba(0,0,0,0.5);}
+      .main-content{margin-left:0;}
+      .topbar{padding:0 16px;}
+      .mobile-menu-btn{display:flex!important;}
+      .mobile-overlay{display:block!important;}
+    }
+
+    .mobile-menu-btn{
+      display:none;
+      align-items:center;justify-content:center;
+      width:36px;height:36px;border-radius:8px;
+      background:var(--surface2);border:1px solid var(--border);
+      cursor:pointer;font-size:16px;flex-shrink:0;
+    }
+    .mobile-overlay{
+      display:none;
+      position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:199;
+    }
+
+    /* ── Glow orb behind header logo ── */
+    .logo-glow{
+      position:absolute;width:120px;height:120px;
+      background:radial-gradient(circle,rgba(124,58,237,0.3) 0%,transparent 70%);
+      top:-30px;left:-30px;pointer-events:none;filter:blur(20px);
+    }
+
+    /* ── Mobile ── */
+    @media(max-width:640px){
+      .hide-mobile{display:none!important;}
+      .stack-mobile{flex-direction:column!important;}
+      .full-mobile{grid-template-columns:1fr!important;}
+      .stats-grid{grid-template-columns:repeat(2,1fr);}
+      .card{padding:14px 16px!important;}
+      input,select,textarea{font-size:16px!important;}
+      .topbar-actions{gap:6px!important;}
+      .topbar-actions button{padding:6px 10px!important;font-size:10px!important;}
+      h1,h2{font-size:20px!important;}
+    }
+    @media print{
+      header,footer,.no-print{display:none!important;}
+      body{background:white;color:black;}
+      .card{border:1px solid #ccc;background:white;}
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script >
+const {useState,useEffect,useRef,useCallback}=React;
+
+/* ═══════════════════════════════════════════════
+   ⚙️  SUPABASE CONFIG — REPLACE THESE TWO VALUES
+   supabase.com → Your Project → Settings → API
+═══════════════════════════════════════════════ */
+const SUPABASE_URL = "https://vbsvcduprffogqtvsvoy.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZic3ZjZHVwcmZmb2dxdHZzdm95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NzQzMzAsImV4cCI6MjA4ODU1MDMzMH0.Tatkmc77LYWq9GaQ5F5d0eFKosSbvXq6pCZB86xYLzU";
+
+const isConfigured = SUPABASE_URL !== "YOUR_SUPABASE_URL";
+const supabase = isConfigured ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+function OfflineBanner(){
+  const [offline,setOffline]=React.useState(!navigator.onLine);
+  React.useEffect(()=>{
+    const goOn=()=>setOffline(false);
+    const goOff=()=>setOffline(true);
+    window.addEventListener('online',goOn);
+    window.addEventListener('offline',goOff);
+    return()=>{window.removeEventListener('online',goOn);window.removeEventListener('offline',goOff);};
+  },[]);
+  if(!offline)return null;
+  return React.createElement('div',{style:{
+    position:'fixed',top:0,left:0,right:0,zIndex:9999,
+    background:'#EF4444',color:'#fff',textAlign:'center',
+    padding:'10px',fontSize:12,
+    fontFamily:"'JetBrains Mono',monospace",
+    fontWeight:700,letterSpacing:'0.05em'
+  }},'⚠️  You are offline — changes will not be saved until connection is restored');
+}
+
+/* ── helpers ── */
+const today=()=>new Date().toISOString().split("T")[0];
+const nowTs=()=>new Date().toISOString();
+const uid=()=>`id_${Date.now()}_${Math.random().toString(36).slice(2,7)}`;
+const daysLeft=d=>d?Math.ceil((new Date(d)-new Date())/(864e5)):null;
+const fmtDate=d=>d?new Date(d).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}):"";
+const fmtTs=ts=>{if(!ts)return"";const d=new Date(ts);return d.toLocaleDateString("en-US",{month:"short",day:"numeric"})+' '+d.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"});};
+
+/* ── Friendly auth error messages ── */
+function friendlyAuthError(err){
+  if(!err)return null;
+  const msg=(err.message||"").toLowerCase();
+  if(msg.includes("invalid login credentials"))return"Incorrect email or password. Please try again.";
+  if(msg.includes("email not confirmed"))return"Please confirm your email first. Check your inbox.";
+  if(msg.includes("user already registered"))return"An account with this email already exists. Try signing in.";
+  if(msg.includes("password should be"))return"Password must be at least 6 characters.";
+  if(msg.includes("unable to validate"))return"Invalid email address format.";
+  if(msg.includes("rate limit")||msg.includes("too many"))return"Too many attempts. Please wait a moment and try again.";
+  if(msg.includes("network")||msg.includes("fetch"))return"Network error. Check your connection and try again.";
+  return err.message||"Something went wrong. Please try again.";
+}
+
+function Spinner({dark}){
+  return <span className={dark?"spinner spinner-dark":"spinner"}/>;
+}
+
+function getDrift(crs){
+  if(!crs||!crs.length)return{pct:0,level:"No Drift",color:"#10B981",grade:"A"};
+  const pct=Math.round(((crs.filter(c=>c.status==="approved").length+crs.filter(c=>c.status==="pending").length*.5)/crs.length)*100);
+  if(pct<20)return{pct,level:"Minimal",color:"#10B981",grade:"A"};
+  if(pct<40)return{pct,level:"Moderate",color:"#F59E0B",grade:"B"};
+  if(pct<60)return{pct,level:"High",color:"#F97316",grade:"C"};
+  return{pct,level:"Critical ⚠",color:"#EF4444",grade:"D"};
+}
+
+function getHealth(proj){
+  const crs=proj.changeRequests||proj.change_requests||[];
+  const d=getDrift(crs);
+  const dl=daysLeft(proj.dueDate||proj.due_date);
+  let score=100;
+  score-=d.pct*0.4;
+  const pending=crs.filter(c=>c.status==="pending").length;
+  score-=pending*8;
+  if(dl!==null){if(dl<0)score-=30;else if(dl<7)score-=15;else if(dl<14)score-=5;}
+  score=Math.max(0,Math.min(100,Math.round(score)));
+  const color=score>70?"#00E5A0":score>40?"#F5A623":"#F1416C";
+  const label=score>70?"Healthy":score>40?"At Risk":"Critical";
+  return{score,color,label};
+}
+
+const SC={
+  pending:{bg:"rgba(245,166,35,0.1)",text:"#F5A623",border:"rgba(245,166,35,0.3)",label:"Pending"},
+  approved:{bg:"rgba(0,229,160,0.08)",text:"#00E5A0",border:"rgba(0,229,160,0.28)",label:"Approved"},
+  rejected:{bg:"#2A0A0A",text:"#EF4444",border:"#7F1D1D",label:"Rejected"},
+};
+const IC={"Low":"#10B981","Medium":"#F59E0B","High":"#F97316","Very High":"#EF4444"};
+
+const AUDIT_ICONS={
+  created:"🔒", approved:"✅", rejected:"❌", commented:"💬",
+  bulk_approved:"✅", bulk_rejected:"❌", submitted:"📋", auto_rejected:"⏱"
+};
+
+const PT=[
+  {name:"Website Redesign",baseline:"Redesign the existing website with updated UI, new homepage, about page, and contact form. Mobile responsive. No backend changes."},
+  {name:"Mobile App MVP",baseline:"Build a mobile app with onboarding, home feed, profile, and settings. No payments. iOS only for MVP."},
+  {name:"API Integration",baseline:"Integrate third-party API for data sync. Includes error handling, logging, and retry logic. No UI changes."},
+  {name:"Dashboard Build",baseline:"Build analytics dashboard with 5 charts, date range filter, and CSV export. Read-only data. No user management."},
+];
+const CRT=["Add a new page/screen","Change tech stack or framework","Add third-party integration","Extend project deadline","Add user authentication","Add payment/billing","Change approved design mockups","Add admin panel","Add mobile/responsive support"];
+
+const DEMO_PROJECTS=[
+  {id:"p1",name:"Client Dashboard Redesign",client:"Acme Corp",owner:"admin",dueDate:"2026-06-15",createdAt:"2026-01-10",baseline:"Redesign main dashboard with new charts, navigation, and dark mode toggle. No backend changes.",driftHistory:[0,5,12,22,30],
+  auditLog:[
+    {id:"a1",action:"created",actor:"admin",detail:"Project scope locked.",ts:"2026-01-10T09:00:00Z"},
+    {id:"a2",action:"submitted",actor:"Client (Mark)",detail:"Submitted CR: Add CSV export to all charts",ts:"2026-01-15T10:00:00Z"},
+    {id:"a3",action:"approved",actor:"admin",detail:"Approved: Add CSV export to all charts",ts:"2026-01-16T11:00:00Z"},
+    {id:"a4",action:"submitted",actor:"Client (Mark)",detail:"Submitted CR: Integrate Slack notifications",ts:"2026-01-18T14:00:00Z"},
+    {id:"a5",action:"rejected",actor:"admin",detail:"Rejected: Integrate Slack notifications",ts:"2026-01-19T09:30:00Z"},
+  ],
+  changeRequests:[
+    {id:"c1",description:"Add CSV export to all charts",impact:"High — +3 days",requestedBy:"Client (Mark)",status:"approved",priority:"urgent",createdAt:"2026-01-15",comments:[{author:"admin",text:"Approved — will be in next sprint.",date:"2026-01-16"}],rate:0},
+    {id:"c2",description:"Integrate Slack notifications",impact:"Very High — +1 week",requestedBy:"Client (Mark)",status:"rejected",priority:"normal",createdAt:"2026-01-18",comments:[{author:"admin",text:"Out of scope. Phase 2 candidate.",date:"2026-01-19"}],rate:0},
+    {id:"c3",description:"Change primary color to teal",impact:"Low — ~4 hours",requestedBy:"Designer (Sara)",status:"pending",priority:"normal",createdAt:"2026-01-22",comments:[],rate:0},
+  ]},
+  {id:"p2",name:"Mobile App MVP",client:"StartupXYZ",owner:"admin",dueDate:"2026-04-30",createdAt:"2026-01-20",baseline:"4-screen React Native app: onboarding, feed, profile, settings. No payments. iOS only.",driftHistory:[0,10,25,48],
+  auditLog:[
+    {id:"a6",action:"created",actor:"admin",detail:"Project scope locked.",ts:"2026-01-20T08:00:00Z"},
+    {id:"a7",action:"submitted",actor:"CEO (James)",detail:"Submitted CR: Add Android support for launch",ts:"2026-01-25T13:00:00Z"},
+  ],
+  changeRequests:[
+    {id:"c4",description:"Add Android support for launch",impact:"Very High — +2 weeks",requestedBy:"CEO (James)",status:"pending",priority:"urgent",createdAt:"2026-01-25",comments:[],rate:0},
+  ]},
+];
+
+/* ══════════════════════════════════════════════
+   COMPONENTS
+══════════════════════════════════════════════ */
+
+/* ── Undo Toast ── */
+function UndoBar({msg,onUndo,onDone}){
+  useEffect(()=>{const t=setTimeout(onDone,5000);return()=>clearTimeout(t);},[]);
+  return(
+    <div className="undo-bar no-print">
+      <span style={{color:"var(--text)"}}>{msg}</span>
+      <button onClick={onUndo} style={{background:"var(--amber)",color:"#000",border:"none",borderRadius:5,padding:"5px 14px",fontSize:11,fontWeight:700}}>Undo</button>
+      <button onClick={onDone} style={{background:"transparent",border:"none",color:"var(--muted)",fontSize:14,lineHeight:1}}>✕</button>
+      <div className="undo-progress"/>
+    </div>
+  );
+}
+
+function Toast({msg,onDone}){
+  useEffect(()=>{const t=setTimeout(onDone,3000);return()=>clearTimeout(t);},[]);
+  return <div style={{position:"fixed",top:20,right:20,zIndex:9999,background:"#065F46",color:"#10B981",border:"1px solid #10B981",borderRadius:8,padding:"11px 18px",fontSize:12,fontWeight:700,boxShadow:"0 8px 24px rgba(0,0,0,0.4)",maxWidth:300}}>{msg}</div>;
+}
+
+function Modal({title,onClose,children,wide}){
+  return(
+    <div className="modal-bg" onClick={onClose}>
+      <div className="modal fade" style={wide?{maxWidth:680}:{}} onClick={e=>e.stopPropagation()}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
+          <h3 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:17}}>{title}</h3>
+          <button className="btn-g" onClick={onClose} style={{padding:"4px 10px"}}>✕</button>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function DriftChart({history}){
+  const max=Math.max(...history,10);
+  return(
+    <div>
+      <div className="lbl">Drift History</div>
+      <div style={{display:"flex",alignItems:"flex-end",gap:3,height:48,marginTop:6}}>
+        {history.map((v,i)=>(
+          <div key={i} style={{flex:1,borderRadius:"2px 2px 0 0",minWidth:6,height:`${(v/max)*100}%`,background:v<20?"#10B981":v<50?"#F59E0B":"#EF4444",opacity:0.5+i/history.length*.5}} title={`${v}%`}/>
+        ))}
+      </div>
+      <div style={{display:"flex",justifyContent:"space-between",fontSize:8,color:"var(--muted)",marginTop:3}}><span>start</span><span>now</span></div>
+    </div>
+  );
+}
+
+function HealthRing({score,color,label}){
+  return(
+    <div style={{textAlign:"center"}}>
+      <div className="health-ring" style={{background:`${color}18`,border:`2px solid ${color}`,color}}>{score}</div>
+      <div style={{fontSize:9,color,marginTop:3,letterSpacing:"0.06em"}}>{label.toUpperCase()}</div>
+    </div>
+  );
+}
+
+/* ── Audit Log Modal ── */
+function CRCommentsModal({cr,projId,user,onClose}){
+  const [comments,setComments]=useState([]);
+  const [loading,setLoading]=useState(true);
+  const [text,setText]=useState("");
+  const [sending,setSending]=useState(false);
+
+  useEffect(()=>{
+    loadComments();
+  },[cr.id]);
+
+  async function loadComments(){
+    setLoading(true);
+    try{
+      const{data}=await supabase.from("audit_logs").select("*")
+        .eq("project_id",projId).eq("action","commented")
+        .order("created_at",{ascending:true});
+      // Filter by cr_id if available, else show all comments for project
+      const filtered=(data||[]).filter(l=>!l.cr_id||l.cr_id===cr.id);
+      setComments(filtered.map(l=>({
+        author:l.actor.replace(" (client)",""),
+        isClient:l.actor.includes("(client)"),
+        text:(l.detail||"").replace(/^Client comment.*?:\s*"/,"").replace(/"$/,""),
+        date:(l.created_at||"").split("T")[0],
+        time:(l.created_at||"").split("T")[1]?.slice(0,5)||""
+      })));
+    }catch(e){}
+    setLoading(false);
+  }
+
+  async function sendReply(){
+    if(!text.trim())return;
+    setSending(true);
+    try{
+      await supabase.from("audit_logs").insert({
+        project_id:projId,
+        action:"commented",
+        actor:(user.user_metadata?.full_name||user.email),
+        detail:`Client comment on CR: "${text.trim()}"`,
+        cr_id:cr.id,
+        created_at:nowTs()
+      });
+      setText("");
+      await loadComments();
+    }catch(e){}
+    setSending(false);
+  }
+
+  return(
+    <Modal title="💬 Client Comments" onClose={onClose}>
+      <div style={{background:"var(--surface2)",borderRadius:10,padding:"12px 16px",marginBottom:16,borderLeft:"3px solid var(--teal)"}}>
+        <div style={{fontSize:13,fontWeight:600,marginBottom:3}}>{cr.description}</div>
+        <div style={{fontSize:11,color:"var(--muted)"}}>By {cr.requestedBy||cr.requested_by} · <span style={{color:SC[cr.status]?.text||"var(--muted)"}}>{cr.status?.toUpperCase()}</span></div>
+      </div>
+      <div style={{display:"grid",gap:8,marginBottom:14,maxHeight:280,overflowY:"auto"}}>
+        {loading&&<div style={{textAlign:"center",padding:16}}><Spinner/></div>}
+        {!loading&&!comments.length&&(
+          <p style={{fontSize:12,color:"var(--muted)",textAlign:"center",padding:"16px 0"}}>No comments yet from client.</p>
+        )}
+        {comments.map((c,i)=>(
+          <div key={i} style={{display:"flex",gap:8,alignItems:"flex-start"}}>
+            <div style={{width:26,height:26,borderRadius:"50%",background:c.isClient?"rgba(0,245,212,0.15)":"rgba(124,58,237,0.15)",border:`1px solid ${c.isClient?"rgba(0,245,212,0.3)":"rgba(124,58,237,0.3)"}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,color:c.isClient?"var(--teal)":"var(--primary)",flexShrink:0}}>
+              {c.author[0]?.toUpperCase()||"?"}
+            </div>
+            <div style={{flex:1,background:"var(--surface2)",borderRadius:8,padding:"9px 13px"}}>
+              <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
+                <span style={{fontSize:11,fontWeight:600,color:c.isClient?"var(--teal)":"var(--blue)"}}>{c.author} {c.isClient&&<span style={{fontSize:9,background:"rgba(0,245,212,0.1)",border:"1px solid rgba(0,245,212,0.2)",borderRadius:4,padding:"1px 5px",marginLeft:4}}>CLIENT</span>}</span>
+                <span style={{fontSize:9,color:"var(--muted)"}}>{c.date} {c.time}</span>
+              </div>
+              <div style={{fontSize:12,lineHeight:1.5}}>{c.text}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{display:"flex",gap:8}}>
+        <input placeholder="Reply to client…" value={text} onChange={e=>setText(e.target.value)}
+          onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey)sendReply();}}
+          style={{fontSize:12}}/>
+        <button className="btn-p" style={{flexShrink:0,fontSize:11,padding:"8px 16px"}}
+          disabled={!text.trim()||sending} onClick={sendReply}>
+          {sending?"…":"Send"}
+        </button>
+      </div>
+    </Modal>
+  );
+}
+
+function AuditLogModal({proj,onClose}){
+  const [log,setLog]=useState([]);
+  const [loading,setLoading]=useState(true);
+  useEffect(()=>{
+    if(!isConfigured){setLog([]);setLoading(false);return;}
+    (async()=>{
+      try{
+        const{data}=await supabase.from("audit_logs").select("*").eq("project_id",proj.id).order("created_at",{ascending:false});
+        setLog(data||[]);
+      }catch(e){} finally{setLoading(false);}
+    })();
+  },[proj.id]);
+  const colorMap={created:"#10B981",approved:"#10B981",bulk_approved:"#10B981",rejected:"#EF4444",bulk_rejected:"#EF4444",auto_rejected:"#F97316",submitted:"#F59E0B",commented:"#3B82F6"};
+  return(
+    <Modal title="📋 Audit Log" onClose={onClose} wide>
+      <p style={{fontSize:11,color:"var(--muted)",marginBottom:18}}>History for <strong style={{color:"var(--text)"}}>{proj.name}</strong></p>
+      {loading?<div style={{textAlign:"center",padding:32}}><Spinner/></div>:!log.length?<p style={{fontSize:12,color:"var(--muted)"}}>No events yet.</p>:(
+        <div style={{display:"grid",gap:0,maxHeight:"60vh",overflowY:"auto",paddingRight:4}}>
+          {log.map((entry,i)=>(
+            <div key={entry.id} style={{display:"flex",gap:12,paddingBottom:16,position:"relative"}}>
+              {i<log.length-1&&<div style={{position:"absolute",left:11,top:20,bottom:0,width:2,background:"var(--border)"}}/>}
+              <div style={{width:24,height:24,borderRadius:"50%",background:`${colorMap[entry.action]||"var(--muted)"}22`,border:`1px solid ${colorMap[entry.action]||"var(--border)"}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,flexShrink:0,zIndex:1}}>
+                {AUDIT_ICONS[entry.action]||"•"}
+              </div>
+              <div style={{flex:1,paddingTop:2}}>
+                <div style={{fontSize:12,lineHeight:1.5}}>{entry.detail}</div>
+                <div style={{fontSize:10,color:"var(--muted)",marginTop:3,display:"flex",gap:8}}>
+                  <span style={{color:colorMap[entry.action]||"var(--muted)",fontWeight:700}}>{entry.actor}</span>
+                  <span>·</span><span>{fmtTs(entry.created_at)}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </Modal>
+  );
+}
+function ShareModal({proj,brand,onClose}){
+  const [copied,setCopied]=useState(false);
+  const [clientCan,setClientCan]=useState("comment");
+  // Recompute URL every render so it always reflects current clientCan
+  function getUrl(can){
+    const shareData=encodeURIComponent(JSON.stringify({id:proj.id,clientCan:can,brand}));
+    return `${window.location.href.split("?")[0].split("#")[0]}?readonly=${shareData}`;
+  }
+  const url=getUrl(clientCan);
+  return(
+    <Modal title="🔗 Client Share Link" onClose={onClose}>
+      <p style={{fontSize:12,color:"var(--muted)",marginBottom:14,lineHeight:1.6}}>Share a read-only link. No login required for your client.</p>
+      <div className="lbl">Client permissions</div>
+      <div style={{display:"flex",gap:8,marginBottom:16}}>
+        {["view","comment"].map(p=>(
+          <button key={p} onClick={()=>setClientCan(p)} style={{flex:1,padding:8,borderRadius:6,fontSize:11,fontWeight:700,border:`1px solid ${clientCan===p?"var(--amber)":"var(--border)"}`,background:clientCan===p?"rgba(245,158,11,0.1)":"transparent",color:clientCan===p?"var(--amber)":"var(--muted)"}}>
+            {p==="view"?"👁 View Only":"💬 View + Comment"}
+          </button>
+        ))}
+      </div>
+      <div style={{background:"var(--surface2)",border:"1px solid var(--border)",borderRadius:6,padding:"10px 13px",fontSize:11,color:"var(--muted)",wordBreak:"break-all",display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
+        <span style={{flex:1,wordBreak:"break-all",fontSize:10}}>{url.slice(0,100)}{url.length>100?"...":""}</span>
+        <button className="btn-p" style={{padding:"5px 12px",fontSize:10,flexShrink:0}} onClick={()=>{navigator.clipboard.writeText(url);setCopied(true);setTimeout(()=>setCopied(false),2000);}}>
+          {copied?"✓ Copied!":"Copy"}
+        </button>
+      </div>
+      <p style={{fontSize:10,color:"var(--muted)"}}>⚠️ Anyone with this link can {clientCan==="comment"?"view and comment on":"view"} this project. Link always shows latest data.</p>
+    </Modal>
+  );
+}
+
+function InvoiceModal({proj,onClose}){
+  const approved=(proj?.changeRequests||[]).filter(c=>c.status==="approved");
+  const [rate,setRate]=useState(150);
+  const [currency,setCurrency]=useState("USD");
+
+  function getHours(cr){
+    if(cr.hours)return Number(cr.hours);
+    const lower=((cr.impact)||"").toLowerCase();
+    if(lower.includes("very high"))return 80;
+    if(lower.includes("high"))return 24;
+    if(lower.includes("medium"))return 8;
+    return 4;
+  }
+  function getCharge(cr){
+    if(cr.charge)return Number(cr.charge);
+    return getHours(cr)*rate;
+  }
+
+  const total=approved.reduce((a,c)=>a+getCharge(c),0);
+
+  function printInvoice(){
+    const w=window.open("","_blank");
+    w.document.write(`<html><head><title>Invoice - ${proj.name}</title><style>body{font-family:monospace;padding:40px;max-width:700px;margin:0 auto;}h1{font-size:28px;margin-bottom:4px;}table{width:100%;border-collapse:collapse;margin:20px 0;}th,td{text-align:left;padding:10px;border-bottom:1px solid #eee;}th{background:#f5f5f5;font-weight:bold;}tfoot td{font-weight:bold;font-size:16px;padding-top:16px;border-top:2px solid #333;}</style></head><body>`);
+    w.document.write(`<h1>Invoice</h1><p><strong>Project:</strong> ${proj.name}</p><p><strong>Client:</strong> ${proj.client}</p><p><strong>Date:</strong> ${today()}</p><hr/>`);
+    w.document.write(`<table><thead><tr><th>Change</th><th>Est. Hours</th><th>Rate</th><th>Amount</th></tr></thead><tbody>`);
+    approved.forEach(c=>{
+      const hrs=getHours(c);const chg=getCharge(c);
+      w.document.write(`<tr><td>${c.description}</td><td>${c.hours?c.hours+"h (actual)":hrs+"h (est.)"}</td><td>${c.charge?"Fixed rate":currency+" "+rate+"/hr"}</td><td>${currency} ${chg.toLocaleString()}</td></tr>`);
+    });
+    w.document.write(`</tbody><tfoot><tr><td colspan="3">Total</td><td>${currency} ${total.toLocaleString()}</td></tr></tfoot></table>`);
+    w.document.write(`<p style="margin-top:40px;color:#888;font-size:12px;">Generated by ScopeLock</p></body></html>`);
+    w.print();
+  }
+
+  return(
+    <Modal title="🧾 Invoice Generator" onClose={onClose}>
+      <p style={{fontSize:12,color:"var(--muted)",marginBottom:16}}>Generate an invoice from approved scope changes.</p>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:16}}>
+        <div><div className="lbl">Hourly Rate</div><input type="number" value={rate} onChange={e=>setRate(+e.target.value)} min={1}/></div>
+        <div><div className="lbl">Currency</div>
+          <select value={currency} onChange={e=>setCurrency(e.target.value)}>
+            {["USD","PHP","EUR","GBP","SGD","AUD"].map(c=><option key={c}>{c}</option>)}
+          </select>
+        </div>
+      </div>
+      {approved.length===0?<p style={{color:"var(--muted)",fontSize:12}}>No approved changes to invoice yet.</p>:(
+        <>
+          <div style={{display:"grid",gap:8,marginBottom:16}}>
+            {approved.map(c=>{
+              const hrs=getHours(c);const chg=getCharge(c);
+              return(
+                <div key={c.id} className="card" style={{padding:"10px 14px",display:"flex",justifyContent:"space-between",alignItems:"center",gap:8}}>
+                  <span style={{fontSize:12,flex:1}}>{c.description.length>60?c.description.slice(0,60)+"…":c.description}</span>
+                  <span style={{fontSize:11,color:"var(--muted)",flexShrink:0}}>{c.charge?<span style={{color:"var(--teal)"}}>Fixed: {currency} {Number(c.charge).toLocaleString()}</span>:<span>{hrs}h × {rate} = <strong style={{color:"var(--amber)"}}>{currency} {(hrs*rate).toLocaleString()}</strong></span>}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div style={{background:"var(--surface2)",borderRadius:8,padding:"12px 16px",display:"flex",justifyContent:"space-between",marginBottom:16}}>
+            <span style={{fontFamily:"'Syne',sans-serif",fontWeight:700}}>Total</span>
+            <span style={{color:"var(--amber)",fontWeight:700,fontSize:18}}>{currency} {total.toLocaleString()}</span>
+          </div>
+          <button className="btn-p" style={{width:"100%",padding:11}} onClick={printInvoice}>🖨 Print / Save PDF</button>
+        </>
+      )}
+    </Modal>
+  );
+}
+
+function AnalyticsView({projects}){
+  const allCRs=projects.flatMap(p=>p.changeRequests||[]);
+  const byStatus={approved:allCRs.filter(c=>c.status==="approved").length,rejected:allCRs.filter(c=>c.status==="rejected").length,pending:allCRs.filter(c=>c.status==="pending").length};
+  const approvalRate=allCRs.length?Math.round((byStatus.approved/allCRs.length)*100):0;
+  const avgDrift=projects.length?Math.round(projects.reduce((a,p)=>a+getDrift(p.changeRequests||[]).pct,0)/projects.length):0;
+  const urgentPending=allCRs.filter(c=>c.status==="pending"&&c.priority==="urgent").length;
+  const typeCount={};
+  allCRs.forEach(c=>{const k=(c.impact||"Unknown").split(" —")[0]||"Unknown";typeCount[k]=(typeCount[k]||0)+1;});
+  const sorted=Object.entries(typeCount).sort((a,b)=>b[1]-a[1]);
+  const maxBar=Math.max(...Object.values(typeCount),1);
+  return(
+    <div className="fade">
+      <h2 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:22,marginBottom:4}}>Analytics</h2>
+      <p style={{color:"var(--muted)",fontSize:12,marginBottom:28}}>Across all {projects.length} project{projects.length!==1?"s":""}</p>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12,marginBottom:28}} className="full-mobile">
+        {[
+          {label:"Total Changes",value:allCRs.length,color:"var(--amber)"},
+          {label:"Approval Rate",value:`${approvalRate}%`,color:"#10B981"},
+          {label:"Avg Drift",value:`${avgDrift}%`,color:avgDrift>40?"#EF4444":avgDrift>20?"#F59E0B":"#10B981"},
+          {label:"Urgent Pending",value:urgentPending,color:urgentPending>0?"#EF4444":"var(--muted)"},
+        ].map(s=>(
+          <div key={s.label} className="card" style={{padding:"16px 18px"}}>
+            <div className="lbl">{s.label}</div>
+            <div style={{fontSize:30,fontWeight:700,color:s.color,lineHeight:1,marginTop:4}}>{s.value}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:24}} className="full-mobile">
+        <div className="card" style={{padding:"20px 22px"}}>
+          <div className="lbl" style={{marginBottom:14}}>Change Status Breakdown</div>
+          {Object.entries(byStatus).map(([k,v])=>(
+            <div key={k} style={{marginBottom:12}}>
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:12,marginBottom:5}}>
+                <span style={{textTransform:"capitalize",color:SC[k]?.text||"var(--text)"}}>{k}</span>
+                <span style={{fontWeight:700}}>{v}</span>
+              </div>
+              <div className="dbar"><div style={{height:"100%",width:allCRs.length?`${(v/allCRs.length)*100}%`:"0%",background:SC[k]?.text||"var(--amber)",borderRadius:3}}/></div>
+            </div>
+          ))}
+        </div>
+        <div className="card" style={{padding:"20px 22px"}}>
+          <div className="lbl" style={{marginBottom:14}}>Impact Distribution</div>
+          {sorted.map(([k,v])=>(
+            <div key={k} style={{marginBottom:12}}>
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:12,marginBottom:5}}>
+                <span style={{color:IC[k]||"var(--muted)"}}>{k}</span>
+                <span style={{fontWeight:700}}>{v}</span>
+              </div>
+              <div className="dbar"><div style={{height:"100%",width:`${(v/maxBar)*100}%`,background:IC[k]||"var(--muted)",borderRadius:3}}/></div>
+            </div>
+          ))}
+          {!sorted.length&&<p style={{fontSize:12,color:"var(--muted)"}}>No change requests yet.</p>}
+        </div>
+      </div>
+      <div className="card" style={{padding:"20px 22px"}}>
+        <div className="lbl" style={{marginBottom:14}}>Project Health Summary</div>
+        <div style={{display:"grid",gap:10}}>
+          {projects.map(p=>{
+            const h=getHealth(p);const d=getDrift(p.changeRequests||[]);const dl=daysLeft(p.dueDate||p.due_date);
+            return(
+              <div key={p.id} style={{display:"flex",alignItems:"center",gap:16,padding:"10px 0",borderBottom:"1px solid var(--border)"}}>
+                <HealthRing score={h.score} color={h.color} label={h.label}/>
+                <div style={{flex:1}}>
+                  <div style={{fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:14,marginBottom:3}}>{p.name}</div>
+                  <div style={{fontSize:11,color:"var(--muted)"}}>{p.client} · Drift: <span style={{color:d.color}}>{d.pct}%</span> · {(p?.changeRequests||[]).filter(c=>c.status==="pending").length} pending{dl!==null?` · ${dl>0?dl+"d left":Math.abs(dl)+"d overdue"}`:""}</div>
+                </div>
+                <div style={{fontSize:22,fontWeight:700,color:h.color}}>{h.score}</div>
+              </div>
+            );
+          })}
+          {!projects.length&&<p style={{fontSize:12,color:"var(--muted)"}}>No projects yet.</p>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BillingView({plan,setPlan}){
+  const plans=[
+    {id:"free",name:"Free",price:"$0",period:"forever",features:["1 active project","Unlimited change requests","Approve/reject workflow","Scope drift dashboard"],color:"var(--muted)"},
+    {id:"pro",name:"Pro",price:"$9",period:"/month",features:["Up to 5 projects","All Free features","PDF & CSV export","Client share links","Invoice generator","Email notifications"],color:"var(--amber)",popular:true},
+    {id:"biz",name:"Business",price:"$19",period:"/month",features:["Unlimited projects","All Pro features","Team roles & permissions","Analytics dashboard","API access","Priority support"],color:"var(--blue)"},
+  ];
+  return(
+    <div className="fade">
+      <h2 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:22,marginBottom:4}}>Billing & Plan</h2>
+      <p style={{color:"var(--muted)",fontSize:12,marginBottom:28}}>Current plan: <span style={{color:"var(--amber)",fontWeight:700}}>{plan.toUpperCase()}</span></p>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14,marginBottom:32}} className="full-mobile">
+        {plans.map(p=>(
+          <div key={p.id} className="card" style={{padding:"24px 20px",border:`1px solid ${plan===p.id?p.color:"var(--border)"}`,position:"relative",background:plan===p.id?`${p.color}08`:"var(--surface)"}}>
+            {p.popular&&<div style={{position:"absolute",top:-10,left:"50%",transform:"translateX(-50%)",background:"var(--amber)",color:"#000",fontSize:9,fontWeight:700,padding:"3px 12px",borderRadius:100,whiteSpace:"nowrap",letterSpacing:"0.06em"}}>MOST POPULAR</div>}
+            <div className="lbl">{p.name}</div>
+            <div style={{fontSize:34,fontWeight:800,fontFamily:"'Syne',sans-serif",lineHeight:1,color:p.color,marginBottom:2}}>{p.price}<span style={{fontSize:13,fontWeight:400,color:"var(--muted)"}}>{p.period}</span></div>
+            <ul style={{listStyle:"none",margin:"16px 0",display:"grid",gap:8}}>
+              {p.features.map(f=><li key={f} style={{fontSize:11,display:"flex",gap:7,alignItems:"flex-start"}}><span style={{color:"#10B981",flexShrink:0}}>✓</span>{f}</li>)}
+            </ul>
+            <button onClick={()=>setPlan(p.id)} className={plan===p.id?"btn-g":"btn-p"} style={{width:"100%",padding:9,fontSize:11,background:plan===p.id?"transparent":p.id==="pro"?"var(--amber)":p.id==="biz"?"var(--blue)":"var(--amber)"}}>
+              {plan===p.id?"Current Plan":"Switch to "+p.name}
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function BrandSettings({brand,setBrand,onSave}){
+  return(
+    <div className="fade">
+      <h2 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:22,marginBottom:4}}>Branding</h2>
+      <p style={{color:"var(--muted)",fontSize:12,marginBottom:24}}>Customize how your client portal looks.</p>
+      <div className="card" style={{padding:24,display:"grid",gap:18}}>
+        <div><div className="lbl">Company Name</div><input placeholder="Your Company Name" maxLength={50} value={brand.company} onChange={e=>setBrand(b=>({...b,company:e.target.value}))}/></div>
+        <div><div className="lbl">Tagline</div><input placeholder="e.g. Building great things together" value={brand.tagline} onChange={e=>setBrand(b=>({...b,tagline:e.target.value}))}/></div>
+        <div><div className="lbl">Accent Color</div>
+          <div style={{display:"flex",gap:10,alignItems:"center"}}>
+            <input type="color" value={brand.color} onChange={e=>setBrand(b=>({...b,color:e.target.value}))} style={{width:44,height:36,padding:2,borderRadius:6}}/>
+            <span style={{fontSize:12,color:"var(--muted)"}}>{brand.color}</span>
+          </div>
+        </div>
+        <div><div className="lbl">Logo Emoji / Symbol</div><input placeholder="e.g. 🏢 or your initials" value={brand.logo} onChange={e=>setBrand(b=>({...b,logo:e.target.value}))} style={{maxWidth:120}}/></div>
+        <div style={{background:"var(--surface2)",borderRadius:8,padding:"14px 18px"}}>
+          <div className="lbl" style={{marginBottom:10}}>Preview</div>
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <div style={{width:32,height:32,background:brand.color,borderRadius:7,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16}}>{brand.logo||"🔒"}</div>
+            <div>
+              <div style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:15}}>{brand.company||"ScopeLock"}</div>
+              <div style={{fontSize:10,color:"var(--muted)"}}>{brand.tagline||"Lock scope. Track changes."}</div>
+            </div>
+          </div>
+        </div>
+        <div><div className="lbl">Default Currency</div>
+          <select value={brand?.currency||"USD"} onChange={e=>setBrand(b=>({...b,currency:e.target.value}))}>
+            {["USD","PHP","EUR","GBP","SGD","AUD","CAD","JPY"].map(c=><option key={c}>{c}</option>)}
+          </select>
+        </div>
+        <button className="btn-p" style={{padding:11,width:"100%",marginTop:4}} onClick={onSave}>💾 Save Branding</button>
+      </div>
+    </div>
+  );
+}
+
+function KeyboardHelp({onClose}){
+  const shortcuts=[
+    ["N","New Project"],["C","New Change Request"],["D","Go to Dashboard"],["A","Go to Analytics"],
+    ["/","Focus Search"],["Esc","Close modal / Go back"],["T","Toggle dark/light mode"],["?","Show shortcuts"],
+  ];
+  return(
+    <Modal title="⌨️ Keyboard Shortcuts" onClose={onClose}>
+      <div style={{display:"grid",gap:8}}>
+        {shortcuts.map(([k,v])=>(
+          <div key={k} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"6px 0",borderBottom:"1px solid var(--border)"}}>
+            <span style={{fontSize:12,color:"var(--muted)"}}>{v}</span>
+            <span className="kbd">{k}</span>
+          </div>
+        ))}
+      </div>
+    </Modal>
+  );
+}
+
+function ReadOnlyView({data}){
+  const {id, clientCan="comment", brand={}} = data;
+  const [proj, setProj] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [comments, setComments] = useState({});
+  const [newComment, setNewComment] = useState({});
+  const [author, setAuthor] = useState("");
+  const [sending, setSending] = useState({});
+  const [sent, setSent] = useState({});
+  const ac = brand.color || "#F59E0B";
+
+  useEffect(()=>{
+    if(!isConfigured||!id){setLoading(false);return;}
+    // Fetch project
+    (async()=>{
+      try{
+        const{data:p,error}=await supabase.from("projects").select("*").eq("id",id).single();
+        if(error||!p){setLoading(false);return;}
+        const{data:crs}=await supabase.from("change_requests").select("*").eq("project_id",id).order("created_at",{ascending:false});
+        setProj({...p,changeRequests:(crs||[]).map(c=>({...c,requestedBy:c.requested_by,createdAt:c.created_at}))});
+        // Load existing client comments from audit_logs
+        const{data:logs}=await supabase.from("audit_logs").select("*")
+          .eq("project_id",id).eq("action","commented").order("created_at",{ascending:true});
+        if(logs&&logs.length){
+          const grouped={};
+          logs.forEach(log=>{
+            // detail format: 'Client comment on CR: "text"' or 'Client comment: "text"'
+            // We stored project_id not cr_id... so show under project level
+            const crId=log.cr_id||"general";
+            if(!grouped[crId])grouped[crId]=[];
+            grouped[crId].push({
+              author:log.actor.replace(" (client)",""),
+              text:(log.detail||"").replace(/^Client comment.*?: "/,"").replace(/"$/,""),
+              date:(log.created_at||"").split("T")[0]
+            });
+          });
+          setComments(grouped);
+        }
+      }catch(e){console.warn("ReadOnly fetch error:",e);}
+      finally{setLoading(false);}
+    })();
+  },[id]);
+
+  async function sendComment(crId){
+    const text=(newComment[crId]||"").trim();
+    if(!text||!author.trim())return;
+    setSending(s=>({...s,[crId]:true}));
+    if(isConfigured){
+      try{
+        await supabase.from("audit_logs").insert({
+          project_id:id,action:"commented",
+          actor:author.trim()+" (client)",
+          detail:`Client comment on CR: "${text}"`,
+          cr_id:crId,
+          created_at:nowTs()
+        });
+      }catch(e){}
+    }
+    const nc={author:author.trim(),text,date:today()};
+    setComments(prev=>({...prev,[crId]:[...(prev[crId]||[]),nc]}));
+    setNewComment(n=>({...n,[crId]:""}));
+    setSending(s=>({...s,[crId]:false}));
+    setSent(s=>({...s,[crId]:true}));
+    setTimeout(()=>setSent(s=>({...s,[crId]:false})),2000);
+  }
+
+  if(loading) return(
+    <div style={{minHeight:"100vh",background:"var(--bg)",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:16}}>
+      <div style={{width:40,height:40,background:"linear-gradient(135deg,#7C3AED,#00F5D4)",borderRadius:10,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,boxShadow:"0 0 16px rgba(124,58,237,0.4)"}}>🔒</div>
+      <Spinner/>
+      <p style={{color:"var(--muted)",fontSize:12}}>Loading project…</p>
+    </div>
+  );
+
+  if(!proj) return(
+    <div style={{minHeight:"100vh",background:"var(--bg)",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:12}}>
+      <div style={{fontSize:36}}>🔒</div>
+      <p style={{color:"var(--muted)",fontSize:14}}>Project not found or link has expired.</p>
+    </div>
+  );
+
+  const crs=proj.changeRequests||[];
+  const d=getDrift(crs);
+  const clientName=proj.client_name||"Client";
+
+  return(
+    <div style={{minHeight:"100vh",background:"var(--bg)",color:"var(--text)",fontFamily:"'Inter',sans-serif"}}>
+      <div style={{background:"#1A1200",borderBottom:"1px solid #78400A",padding:"8px 24px",textAlign:"center",fontSize:11,color:"#F59E0B"}}>
+        👁️ Read-Only Client View · {clientName}
+      </div>
+      <header style={{background:"rgba(8,11,24,0.92)",borderBottom:"1px solid var(--border)",padding:"0 28px",display:"flex",alignItems:"center",height:56,backdropFilter:"blur(20px)",position:"sticky",top:0,zIndex:100,gap:12}}>
+        <div style={{width:28,height:28,background:ac,borderRadius:6,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14}}>{brand.logo||"🔒"}</div>
+        <div>
+          <div style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:15}}>{brand.company||"ScopeLock"}</div>
+          {brand.tagline&&<div style={{fontSize:9,color:"var(--muted)"}}>{brand.tagline}</div>}
+        </div>
+      </header>
+      <main style={{maxWidth:740,margin:"32px auto",padding:"0 20px"}}>
+        <h1 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:24,marginBottom:4}}>{proj.name}</h1>
+        <div style={{display:"flex",gap:12,marginBottom:24,flexWrap:"wrap"}}>
+          <span className="pill">👤 {clientName}</span>
+          <span className="pill" style={{color:d.color}}>Drift: {d.pct}%</span>
+          <span className="pill">{crs.length} change{crs.length!==1?"s":""}</span>
+        </div>
+        <div className="card" style={{padding:"18px 22px",marginBottom:20,borderLeft:`3px solid ${ac}`}}>
+          <div className="lbl">🔒 Locked Scope Baseline</div>
+          <p style={{fontSize:13,lineHeight:1.8,color:"var(--text)",marginTop:8}}>{proj.baseline||""}</p>
+        </div>
+
+        <h2 style={{fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:18,marginBottom:10}}>Change Requests</h2>
+
+        {clientCan==="comment"&&(
+          <div style={{background:"rgba(245,158,11,0.06)",border:"1px solid rgba(245,158,11,0.2)",borderRadius:8,padding:"14px 18px",marginBottom:16}}>
+            <div className="lbl" style={{marginBottom:6}}>Your name (for comments)</div>
+            <input placeholder="e.g. Juan dela Cruz" value={author} onChange={e=>setAuthor(e.target.value)} style={{maxWidth:280,fontSize:12}}/>
+            {!author&&<div style={{fontSize:10,color:"var(--muted)",marginTop:5}}>⚠ Enter your name before commenting.</div>}
+          </div>
+        )}
+
+        {!crs.length&&(
+          <div className="card" style={{padding:"32px 24px",textAlign:"center",color:"var(--muted)"}}>No change requests yet.</div>
+        )}
+
+        <div style={{display:"grid",gap:10}}>
+          {crs.map((cr)=>{
+            const s=SC[cr.status]||SC.pending;
+            const crComments=comments[cr.id]||[];
+            return(
+              <div key={cr.id} className="card" style={{padding:"16px 20px"}}>
+                <div style={{display:"flex",gap:8,alignItems:"center",marginBottom:8,flexWrap:"wrap"}}>
+                  <span style={{fontSize:9,fontWeight:700,padding:"3px 8px",borderRadius:4,background:s.bg,color:s.text,border:`1px solid ${s.border}`}}>{s.label.toUpperCase()}</span>
+                  {cr.priority==="urgent"&&<span className="tag-u">URGENT</span>}
+                  <span style={{fontSize:11,color:IC[(cr.impact||"").split(" —")[0]]||"var(--muted)"}}>⚡ {cr.impact}</span>
+                </div>
+                <p style={{fontSize:13,marginBottom:5,lineHeight:1.5}}>{cr.description}</p>
+                <p style={{fontSize:11,color:"var(--muted)"}}>By {cr.requestedBy||cr.requested_by} · {((cr.createdAt||cr.created_at||"")).split("T")[0]}</p>
+                {(cr.hours||cr.charge)&&(
+                  <div style={{display:"flex",gap:8,marginTop:5,flexWrap:"wrap"}}>
+                    {cr.hours&&<span style={{fontSize:10,background:"rgba(129,140,248,0.1)",color:"var(--blue)",border:"1px solid rgba(129,140,248,0.2)",borderRadius:5,padding:"2px 8px"}}>🕐 {cr.hours}h additional</span>}
+                    {cr.charge&&<span style={{fontSize:10,background:"rgba(0,245,212,0.08)",color:"var(--teal)",border:"1px solid rgba(0,245,212,0.2)",borderRadius:5,padding:"2px 8px"}}>💰 +{Number(cr.charge||0).toLocaleString()} additional charge</span>}
+                  </div>
+                )}
+                {cr.status==="rejected"&&(cr.rejection_reason||cr.rejectionReason)&&(
+                  <div style={{marginTop:6,background:"rgba(241,65,108,0.06)",border:"1px solid rgba(241,65,108,0.2)",borderRadius:6,padding:"7px 11px",fontSize:11,color:"var(--red)"}}>
+                    ❌ Rejected: {cr.rejection_reason||cr.rejectionReason}
+                  </div>
+                )}
+                {crComments.length>0&&(
+                  <div style={{marginTop:10,borderTop:"1px solid var(--border)",paddingTop:10,display:"grid",gap:6}}>
+                    {crComments.map((c,j)=>(
+                      <div key={j} style={{background:"var(--surface2)",borderRadius:5,padding:"8px 12px"}}>
+                        <div style={{fontSize:9,color:"var(--muted)",marginBottom:3}}>{c.author} · {c.date}</div>
+                        <div style={{fontSize:12}}>{c.text}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {clientCan==="comment"&&(
+                  <div style={{display:"flex",gap:8,marginTop:12}}>
+                    <input placeholder={author?"Leave a comment… (Enter to send)":"Enter your name above first"}
+                      value={newComment[cr.id]||""} disabled={!author.trim()}
+                      onChange={e=>setNewComment(n=>({...n,[cr.id]:e.target.value}))}
+                      onKeyDown={e=>{if(e.key==="Enter")sendComment(cr.id);}}
+                      style={{fontSize:12,opacity:author?1:0.5}}/>
+                    <button className="btn-g"
+                      style={{flexShrink:0,fontSize:11,minWidth:60,background:sent[cr.id]?"#065F46":"",color:sent[cr.id]?"#10B981":""}}
+                      disabled={!author.trim()||!newComment[cr.id]||sending[cr.id]}
+                      onClick={()=>sendComment(cr.id)}>
+                      {sent[cr.id]?"✓ Sent":sending[cr.id]?"…":"Send"}
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </main>
+    </div>
+  );
+}
+
+function AuthScreen({onAuth, onDemo}){
+  const [tab,setTab]=useState("login");
+  const [form,setForm]=useState({email:"",password:"",name:""});
+  const [errors,setErrors]=useState({});
+  const [loading,setLoading]=useState(false);
+  const [googleLoading,setGoogleLoading]=useState(false);
+  const [successMsg,setSuccessMsg]=useState("");
+
+  function validate(){
+    const e={};
+    if(!form.email)e.email="Email is required.";
+    else if(!/\S+@\S+\.\S+/.test(form.email))e.email="Enter a valid email address.";
+    if(!form.password)e.password="Password is required.";
+    else if(form.password.length<6)e.password="Password must be at least 6 characters.";
+    if(tab==="register"&&!form.name)e.name="Name is required.";
+    return e;
+  }
+
+  async function handleSubmit(){
+    setSuccessMsg("");
+    const e=validate();
+    if(Object.keys(e).length){setErrors(e);return;}
+    setErrors({});setLoading(true);
+    try{
+      if(tab==="login"){
+        const{data,error}=await supabase.auth.signInWithPassword({email:form.email,password:form.password});
+        if(error)throw error;
+        onAuth(data.user);
+      } else {
+        const{data,error}=await supabase.auth.signUp({email:form.email,password:form.password,options:{data:{full_name:form.name}}});
+        if(error)throw error;
+        if(data.user&&!data.session){setSuccessMsg("✅ Check your email to confirm your account, then sign in.");setTab("login");}
+        else if(data.user)onAuth(data.user);
+      }
+    } catch(err){setErrors({form:friendlyAuthError(err)});}
+    setLoading(false);
+  }
+
+  function handleDemo(){
+    if(onDemo) onDemo();
+  }
+
+  async function handleGoogle(){
+    setGoogleLoading(true);setErrors({});
+    const{error}=await supabase.auth.signInWithOAuth({provider:"google",options:{redirectTo:window.location.href}});
+    if(error)setErrors({form:friendlyAuthError(error)});
+    setGoogleLoading(false);
+  }
+
+  return(
+    <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",padding:20,background:"var(--bg)"}}>
+      <div style={{maxWidth:400,width:"100%"}}>
+
+        <div style={{textAlign:"center",marginBottom:32}}>
+          <div style={{width:52,height:52,background:"linear-gradient(135deg,#7C3AED,#00F5D4)",borderRadius:14,display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,margin:"0 auto 14px",boxShadow:"0 0 40px rgba(124,58,237,0.4)"}}>🔒</div>
+          <h1 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:28,letterSpacing:"-0.02em"}}>Scope<span style={{backgroundImage:"linear-gradient(135deg,#7C3AED,#00F5D4)",WebkitBackgroundClip:"text",backgroundClip:"text",WebkitTextFillColor:"transparent",color:"transparent"}}>Lock</span></h1>
+          <p style={{color:"var(--muted)",fontSize:12,marginTop:5}}>Stop scope creep before it starts.</p>
+        </div>
+
+        {!isConfigured&&(
+          <div className="config-banner">
+            <strong>⚙️ Setup Required</strong><br/>
+            Replace <code>YOUR_SUPABASE_URL</code> and <code>YOUR_SUPABASE_ANON_KEY</code> at the top of the script with your project credentials.<br/><br/>
+            <strong>supabase.com → Your Project → Settings → API</strong>
+          </div>
+        )}
+
+        <div className="card" style={{padding:28}}>
+          <div style={{display:"flex",gap:8,marginBottom:24,background:"var(--surface2)",borderRadius:8,padding:4}}>
+            {["login","register"].map(t=>(
+              <button key={t} onClick={()=>{setTab(t);setErrors({});setSuccessMsg("");}} style={{flex:1,padding:"8px",borderRadius:6,fontSize:12,fontWeight:700,border:"none",background:tab===t?"var(--surface)":"transparent",color:tab===t?"var(--text)":"var(--muted)",boxShadow:tab===t?"0 1px 4px rgba(0,0,0,0.3)":"none"}}>
+                {t==="login"?"Sign In":"Create Account"}
+              </button>
+            ))}
+          </div>
+
+          <button className="btn-google" onClick={handleGoogle} disabled={!isConfigured||googleLoading}>
+            {googleLoading?<Spinner/>:<svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>}
+            Continue with Google
+          </button>
+
+          <div className="divider">or</div>
+
+          {errors.form&&<div className="err-msg" style={{marginBottom:14,fontSize:12,padding:"10px 14px",background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.3)",borderRadius:6}}>⚠ {errors.form}</div>}
+          {successMsg&&<div className="success-msg" style={{marginBottom:14,fontSize:12,padding:"10px 14px",background:"rgba(16,185,129,0.08)",border:"1px solid rgba(16,185,129,0.3)",borderRadius:6}}>{successMsg}</div>}
+
+          <div style={{display:"grid",gap:14}}>
+            {tab==="register"&&<div>
+                <div className="lbl">Full Name</div>
+                <input type="text" placeholder="Juan dela Cruz" value={form.name}
+                  className={errors.name?"error-field":""}
+                  onChange={e=>{setForm(f=>({...f,name:e.target.value}));if(errors.name)setErrors(ev=>({...ev,name:null}));}}
+                  onKeyDown={e=>{if(e.key==="Enter")handleSubmit();}}/>
+                {errors.name&&<div className="err-msg">⚠ {errors.name}</div>}
+              </div>}
+            <div>
+                <div className="lbl">Email</div>
+                <input type="email" placeholder="you@company.com" value={form.email}
+                  className={errors.email?"error-field":""}
+                  onChange={e=>{setForm(f=>({...f,email:e.target.value}));if(errors.email)setErrors(ev=>({...ev,email:null}));}}
+                  onKeyDown={e=>{if(e.key==="Enter")handleSubmit();}}/>
+                {errors.email&&<div className="err-msg">⚠ {errors.email}</div>}
+              </div>
+            <div>
+                <div className="lbl">Password</div>
+                <input type="password" placeholder="••••••••" value={form.password}
+                  className={errors.password?"error-field":""}
+                  onChange={e=>{setForm(f=>({...f,password:e.target.value}));if(errors.password)setErrors(ev=>({...ev,password:null}));}}
+                  onKeyDown={e=>{if(e.key==="Enter")handleSubmit();}}/>
+                {errors.password&&<div className="err-msg">⚠ {errors.password}</div>}
+              </div>
+            {tab==="login"&&<div style={{textAlign:"right",marginTop:-8}}>
+              <button onClick={async()=>{
+                if(!form.email){setErrors({email:"Enter your email first."});return;}
+                setLoading(true);
+                const{error}=await supabase.auth.resetPasswordForEmail(form.email,{redirectTo:window.location.href});
+                setLoading(false);
+                if(error)setErrors({form:friendlyAuthError(error)});
+                else setSuccessMsg("✅ Password reset email sent. Check your inbox.");
+              }} style={{background:"none",border:"none",color:"var(--amber)",fontSize:11,cursor:"pointer"}}>
+                Forgot password?
+              </button>
+            </div>}
+            <button className="btn-p" style={{padding:12,fontSize:13,display:"flex",alignItems:"center",justifyContent:"center",gap:8}} onClick={handleSubmit} disabled={loading||!isConfigured}>
+              {loading?<><Spinner dark/>{tab==="login"?"Signing in…":"Creating account…"}</>:tab==="login"?"Sign In →":"Create Account →"}
+            </button>
+          </div>
+        </div>
+        <p style={{textAlign:"center",fontSize:10,color:"var(--muted)",marginTop:16}}>Secured by Supabase · Data synced to cloud</p>
+      </div>
+    </div>
+  );
+}
+
+function App(){
+  /* ── Supabase auth ── */
+  const [user,setUser]=useState(null);
+  const [isDemoMode,setIsDemoMode]=useState(false);
+  const [authLoading,setAuthLoading]=useState(true);
+  const [dataLoading,setDataLoading]=useState(false);
+  const [projects,setProjects]=useState([]);
+  const DEMO_PROJECTS = [
+  {
+    id:"demo-proj-1",
+    name:"Santos Restaurant Website",
+    client_name:"Maria Santos",
+    due_date:"2026-04-15",
+    scope:"5-page website: Home, Menu, About, Gallery, Contact. WordPress. Mobile responsive. Contact form included.",
+    not_in_scope:"Online ordering, payment integration, reservation system, admin panel, SEO setup.",
+    created_at:"2026-03-01T08:00:00Z",
+    changeRequests:[
+      {id:"demo-cr-1",title:"Add Online Ordering System",description:"Client wants to add a full online ordering system with cart and checkout.",impact:"High",hours:8,charge:5000,status:"approved",created_at:"2026-03-05T10:00:00Z",rejection_reason:null},
+      {id:"demo-cr-2",title:"Add Reservation Form",description:"Add a table reservation form on the Contact page.",impact:"Medium",hours:3,charge:1500,status:"pending",created_at:"2026-03-08T14:00:00Z",rejection_reason:null},
+      {id:"demo-cr-3",title:"Add Live Chat Widget",description:"Client wants a live chat bubble on every page.",impact:"Low",hours:1,charge:500,status:"rejected",created_at:"2026-03-09T09:00:00Z",rejection_reason:"Out of scope. This was explicitly listed as not included in the project baseline."}
+    ]
+  },
+  {
+    id:"demo-proj-2",
+    name:"Cruz Dental Clinic App",
+    client_name:"Dr. Cruz",
+    due_date:"2026-05-01",
+    scope:"Appointment booking app. Patient login. Schedule view. SMS reminders via Twilio. Admin panel for clinic staff.",
+    not_in_scope:"Payment processing, insurance verification, medical records storage, multi-clinic support.",
+    created_at:"2026-03-10T08:00:00Z",
+    changeRequests:[
+      {id:"demo-cr-4",title:"Add Payment Processing",description:"Client wants patients to pay consultation fees online.",impact:"High",hours:12,charge:8000,status:"pending",created_at:"2026-03-11T11:00:00Z",rejection_reason:null}
+    ]
+  }
+];
+  const [darkMode,setDarkMode]=useState(()=>{try{return localStorage.getItem("sl_dark")!=="false";}catch{return true;}});
+  const [brand,setBrand]=useState({company:"",tagline:"",color:"#F59E0B",logo:"🔒",currency:"USD"});
+  const [plan,setPlan]=useState("free");
+  const [view,setView]=useState("dash");
+  // Update tab title on view change
+  React.useEffect(()=>{
+    const titles = {
+      dash: "Dashboard — ScopeLock",
+      analytics: "Analytics — ScopeLock",
+      billing: "Billing — ScopeLock",
+      brand: "Branding — ScopeLock",
+      np: "New Project — ScopeLock",
+      proj: proj ? `${proj.name} — ScopeLock` : "Project — ScopeLock",
+      ncr: "New Change Request — ScopeLock",
+    };
+    document.title = titles[view] || "ScopeLock — Stop Scope Creep";
+  },[view,proj]);
+  const [pid,setPid]=useState(null);
+  const [np,setNp]=useState({name:"",client:"",baseline:"",dueDate:""});
+  const [hasUnsaved,setHasUnsaved]=useState(false);
+  React.useEffect(()=>{
+    const handler=(e)=>{if(hasUnsaved){e.preventDefault();e.returnValue='';}};
+    window.addEventListener('beforeunload',handler);
+    return()=>window.removeEventListener('beforeunload',handler);
+  },[hasUnsaved]);
+  const [ncr,setNcr]=useState({description:"",impact:"Low",requestedBy:"",priority:"normal"});
+  const [toast,setToast]=useState(null);
+  const [filter,setFilter]=useState("all");
+  const [search,setSearch]=useState("");
+  const [modal,setModal]=useState(null);
+  const [mobileMenuOpen,setMobileMenuOpen]=useState(false);
+  const [ptpl,setPtpl]=useState("");
+  const [crtpl,setCrtpl]=useState("");
+  const [readonlyData,setReadonlyData]=useState(null);
+  const searchRef=useRef();
+  const [selected,setSelected]=useState(new Set());
+  const [undoState,setUndoState]=useState(null);
+  const undoTimerRef=useRef(null);
+  const proj=projects.find(p=>p.id===pid);
+
+  /* ── Supabase: auth listener ── */
+  useEffect(()=>{
+    if(!isConfigured){setAuthLoading(false);return;}
+    supabase.auth.getSession().then(({data:{session}})=>{
+      setUser(session?.user||null);
+      setAuthLoading(false);
+    });
+    const{data:{subscription}}=supabase.auth.onAuthStateChange((_,session)=>{
+      setUser(session?.user||null);
+      if(!session)setProjects([]);
+    });
+    return()=>subscription.unsubscribe();
+  },[]);
+
+  /* ── Load data when user logs in ── */
+  useEffect(()=>{
+    if(!user||!isConfigured||isDemoMode)return;
+    loadProjects();
+    loadUserProfile();
+  },[user,isDemoMode]);
+
+  /* ── Dark mode ── */
+  useEffect(()=>{try{localStorage.setItem("sl_dark",darkMode);}catch{}; document.body.className=darkMode?"":"light";},[darkMode]);
+
+  /* ── Real-time sync ── */
+  useEffect(()=>{
+    if(!user||!isConfigured||isDemoMode)return;
+    const sub=supabase.channel("sl_realtime")
+      .on("postgres_changes",{event:"*",schema:"public",table:"projects",filter:`owner_id=eq.${user.id}`},()=>loadProjects())
+      .on("postgres_changes",{event:"*",schema:"public",table:"change_requests"},()=>loadProjects())
+      .subscribe();
+    return()=>supabase.removeChannel(sub);
+  },[user]);
+
+  async function loadProjects(){
+    if(!user||!isConfigured||isDemoMode)return;
+    setDataLoading(true);
+    const{data:projs}=await supabase.from("projects").select("*").eq("owner_id",user.id).order("created_at",{ascending:false});
+    if(!projs){setDataLoading(false);return;}
+    const{data:crs}=await supabase.from("change_requests").select("*").in("project_id",projs.map(p=>p.id)).order("created_at",{ascending:false});
+    const crsById={};
+    (crs||[]).forEach(cr=>{
+      if(!crsById[cr.project_id])crsById[cr.project_id]=[];
+      crsById[cr.project_id].push({
+        ...cr,
+        requestedBy:cr.requested_by,
+        createdAt:cr.created_at,
+        rejectionReason:cr.rejection_reason,
+        hours:cr.hours,
+        charge:cr.charge,
+      });
+    });
+    setProjects(projs.map(p=>({
+      ...p,
+      changeRequests:crsById[p.id]||[],
+      driftHistory:p.drift_history||[0],
+      // camelCase aliases for render code
+      client:p.client_name,
+      dueDate:p.due_date,
+      createdAt:p.created_at,
+    })));
+    setDataLoading(false);
+  }
+
+  async function loadUserProfile(){
+    if(!user||!isConfigured||isDemoMode)return;
+    const{data,error}=await supabase.from("user_profiles").select("*").eq("user_id",user.id).maybeSingle();
+    if(error){console.warn("user_profiles:",error.message);return;}
+    if(data){
+      setBrand(data.brand||{company:"",tagline:"",color:"#F59E0B",logo:"🔒"});
+      setPlan(data.plan||"free");
+    }
+  }
+
+  useEffect(()=>{
+    const p=new URLSearchParams(window.location.search||window.location.hash.replace(/^#\?/,"")).get("readonly");
+    if(p){try{setReadonlyData(JSON.parse(decodeURIComponent(p)));}catch{}}
+  },[]);
+
+  useEffect(()=>{
+    if(!user||!isConfigured||!projects.length)return;
+    // Auto-reject CRs older than 30 days
+    const stale=projects.flatMap(p=>(p.changeRequests||[]).filter(c=>c.status==="pending"&&Math.ceil((new Date()-new Date(c.createdAt))/(864e5))>30));
+    if(stale.length){
+      const ids=stale.map(c=>c.id);
+      supabase.from("change_requests").update({status:"rejected"}).in("id",ids).then(()=>loadProjects());
+    }
+  },[projects.length]);
+
+  // Clear selection when switching projects or views
+  useEffect(()=>{setSelected(new Set());},[pid,view]);
+
+  useEffect(()=>{
+    function onKey(e){
+      if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA"||e.target.tagName==="SELECT")return;
+      if(e.key==="n"||e.key==="N"){setView("np");}
+      if(e.key==="c"||e.key==="C"){if(proj)setView("ncr");}
+      if(e.key==="d"||e.key==="D"){setView("dash");}
+      if(e.key==="a"||e.key==="A"){setView("analytics");}
+      if(e.key==="t"||e.key==="T"){setDarkMode(d=>!d);}
+      if(e.key==="?"||e.key==="/"){e.preventDefault();if(e.key==="/"){searchRef.current?.focus();}else{setModal("keys");}}
+      if(e.key==="Escape"){setModal(null);if(view==="np"||view==="ncr")setView(view==="np"?"dash":"proj");}
+    }
+    window.addEventListener("keydown",onKey);
+    return()=>window.removeEventListener("keydown",onKey);
+  },[proj,view]);
+
+  if(readonlyData)return <ReadOnlyView data={readonlyData}/>;
+
+  /* ── Auth loading ── */
+  if(authLoading&&!isDemoMode){
+    return(
+      <div className="loading-screen">
+        <div style={{width:40,height:40,background:"linear-gradient(135deg,#7C3AED,#00F5D4)",borderRadius:10,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,boxShadow:"0 0 16px rgba(124,58,237,0.4)"}}>🔒</div>
+        <Spinner/>
+      </div>
+    );
+  }
+
+  /* ── Not authenticated ── */
+  if(!isDemoMode&&(!isConfigured||!user)){
+    return <AuthScreen onAuth={u=>setUser(u)} onDemo={()=>{setIsDemoMode(true);setAuthLoading(false);setUser({id:"demo",email:"demo@scopelock.app"});setProjects(DEMO_PROJECTS);}}/>;
+  }
+
+  function notify(msg){setToast(msg);}
+
+  /* ── Undo helpers ── */
+  function saveUndoSnapshot(msg){
+    if(undoTimerRef.current)clearTimeout(undoTimerRef.current);
+    setUndoState({msg,snapshot:JSON.parse(JSON.stringify(projects))});
+    undoTimerRef.current=setTimeout(()=>setUndoState(null),5000);
+  }
+  function doUndo(){
+    if(undoState){setProjects(undoState.snapshot);notify("↩️ Undone");}
+    setUndoState(null);
+    if(undoTimerRef.current)clearTimeout(undoTimerRef.current);
+  }
+
+  /* ── Audit log helper ── */
+
+  async function createProject(){
+    if(!np.name||!np.baseline)return;
+    if(isDemoMode){
+      const demoProj={id:"demo-"+Date.now(),name:np.name,client_name:np.client||"",due_date:np.due||"",scope:np.baseline,not_in_scope:np.notIn||"",created_at:new Date().toISOString(),changeRequests:[]};
+      setHasUnsaved(false);setProjects(ps=>[...ps,demoProj]);
+      setNp({name:"",client:"",due:"",baseline:"",notIn:""});
+      setView("dash");
+      setHasUnsaved(false);notify("Project created (demo mode — not saved)");
+      return;
+    }
+    const limit=plan==="free"?1:plan==="pro"?5:999;
+    if(projects.length>=limit){notify(`⚠️ ${plan} plan limit. Upgrade to add more.`);return;}
+    const{data,error}=await supabase.from("projects").insert({
+      name:np.name,client_name:np.client||"Internal",owner_id:user.id,
+      due_date:np.dueDate||null,baseline:np.baseline,drift_history:[0]
+    }).select().single();
+    if(error){notify("❌ Failed to create project.");return;}
+    await supabase.from("audit_logs").insert({project_id:data.id,action:"created",actor:user.user_metadata?.full_name||user.email,detail:"Project scope locked.",created_at:nowTs()});
+    setNp({name:"",client:"",baseline:"",dueDate:""});setPtpl("");
+    setView("dash");notify("🔒 Scope locked!");
+    loadProjects();
+  }
+  async function submitCR(){
+    if(!ncr.description||!ncr.requestedBy)return;
+    const impactLabel=ncr.hours||ncr.charge
+      ?`${ncr.impact} — ${ncr.hours?ncr.hours+"h":""}${ncr.hours&&ncr.charge?" · ":""}${ncr.charge?"+"+Number(ncr.charge).toLocaleString()+" "+(brand?.currency||"USD"):""}`
+      :`${ncr.impact} — estimated`;
+    const{data,error}=await supabase.from("change_requests").insert({
+      project_id:pid,description:ncr.description,
+      impact:impactLabel,requested_by:ncr.requestedBy,
+      priority:ncr.priority,status:"pending",
+      hours:ncr.hours?Number(ncr.hours):null,
+      charge:ncr.charge?Number(ncr.charge):null
+    }).select().single();
+    if(error){notify("❌ Failed to submit.");return;}
+    await supabase.from("audit_logs").insert({project_id:pid,action:"submitted",actor:user.user_metadata?.full_name||user.email,detail:`Submitted CR: ${ncr.description}${ncr.charge?" (+"+Number(ncr.charge).toLocaleString()+" "+(brand?.currency||"USD")+")":""}`,created_at:nowTs()});
+    const updatedCRs=[data,...(proj?.changeRequests||[])];
+    const newDrift=getDrift(updatedCRs).pct;
+    await supabase.from("projects").update({drift_history:[...(proj?.driftHistory||[0]),newDrift]}).eq("id",pid);
+    setNcr({description:"",impact:"Low",requestedBy:"",priority:"normal",hours:"",charge:""});setCrtpl("");
+    setView("proj");notify("📋 Change request submitted");
+    loadProjects();
+  }
+  async function setStatus(crId,status,reason=""){
+    const cr=proj?.changeRequests?.find(c=>c.id===crId);
+    if(!cr)return;
+    // Ask for rejection reason
+    if(status==="rejected"&&!reason){
+      const r=window.prompt("Reason for rejection (optional — will be visible to client):");
+      if(r===null)return; // cancelled
+      return setStatus(crId,status,r||"No reason provided");
+    }
+    const snap=JSON.parse(JSON.stringify(projects));
+    saveUndoSnapshot(`${status==="approved"?"✅ Approved":"❌ Rejected"}: ${cr.description.slice(0,40)}…`,snap);
+    setProjects(prev=>prev.map(p=>p.id!==pid?p:{...p,changeRequests:(p?.changeRequests||[]).map(c=>c.id===crId?{...c,status,rejectionReason:reason||c.rejectionReason}:c)}));
+    const{error}=await supabase.from("change_requests").update({status,rejection_reason:status==="rejected"?reason:null}).eq("id",crId);
+    if(error){notify("❌ Update failed.");loadProjects();return;}
+    const detail=status==="approved"
+      ?`Approved CR: ${cr.description}`
+      :`Rejected CR: ${cr.description}. Reason: ${reason}`;
+    await supabase.from("audit_logs").insert({project_id:pid,action:status,actor:user.user_metadata?.full_name||user.email,detail,created_at:nowTs()});
+    notify(status==="approved"?"✅ CR Approved":"❌ CR Rejected");
+    loadProjects();
+  }
+  async function bulkSetStatus(status){
+    if(!selected.size)return;
+    const ids=[...selected];
+    const affected=(proj?.changeRequests||[]).filter(c=>ids.includes(c.id)&&c.status==="pending");
+    if(!affected.length)return;
+    saveUndoSnapshot(`${status==="approved"?"✅":"❌"} ${affected.length} CR${affected.length>1?"s":""} ${status}`,JSON.parse(JSON.stringify(projects)));
+    setProjects(prev=>prev.map(p=>p.id!==pid?p:{...p,changeRequests:(p?.changeRequests||[]).map(c=>ids.includes(c.id)&&c.status==="pending"?{...c,status}:c)}));
+    await supabase.from("change_requests").update({status}).in("id",ids);
+    await supabase.from("audit_logs").insert({project_id:pid,action:`bulk_${status}`,actor:user.user_metadata?.full_name||user.email,detail:`Bulk ${status} ${affected.length} change request${affected.length>1?"s":""}`,created_at:nowTs()});
+    setSelected(new Set());
+    notify(`${status==="approved"?"✅":"❌"} ${affected.length} CR${affected.length>1?"s":""} ${status}`);
+    loadProjects();
+  }
+  async function addComment(crId,comment){
+    const cr=proj?.changeRequests?.find(c=>c.id===crId);
+    await supabase.from("audit_logs").insert({project_id:pid,action:"commented",actor:user.user_metadata?.full_name||user.email,detail:`Comment on "${cr?.description?.slice(0,40)}": ${comment.text}`,created_at:nowTs()});
+  }
+  async function deleteProject(id){
+    if(!window.confirm("Delete this project? This cannot be undone."))return;
+    if(isDemoMode){setProjects(ps=>ps.filter(p=>p.id!==id));setPid(null);setView("dash");notify("🗑️ Deleted (demo)");return;}
+    await supabase.from("audit_logs").delete().eq("project_id",id);
+    await supabase.from("change_requests").delete().eq("project_id",id);
+    await supabase.from("projects").delete().eq("id",id);
+    setPid(null);setView("dash");notify("🗑️ Deleted");
+    loadProjects();
+  }
+  function exportCSV(){
+    if(!proj)return;
+    const headers=["ID","Description","Impact","Requested By","Status","Priority","Created At","Comments Count"];
+    const rows=(proj?.changeRequests||[]).map(c=>[
+      c.id,
+      `"${c.description.replace(/"/g,'""')}"`,
+      `"${c.impact}"`,
+      `"${c.requestedBy||c.requested_by}"`,
+      c.status,
+      c.priority,
+      c.createdAt,
+      c.comments.length
+    ]);
+    const csv=[headers.join(","),...rows.map(r=>r.join(","))].join("\n");
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+    a.download=`${proj.name.replace(/\s+/g,"_")}_changes.csv`;
+    a.click();
+    notify("📊 Exported CSV");
+  }
+
+  function exportTxt(){
+    if(!proj)return;
+    const crs=proj.changeRequests||[];
+    const lines=[
+      `ScopeLock Export — ${proj.name}`,
+      `Client: ${proj.client||proj.client_name||""}`,
+      `Due: ${proj.dueDate||proj.due_date||"N/A"}`,
+      `Baseline: ${proj.baseline}`,
+      ``,
+      ...crs.map(c=>`[${c.status.toUpperCase()}][${c.priority}] ${(c.createdAt||c.created_at||"").split("T")[0]} — ${c.description} | ${c.impact} | ${c.requestedBy||c.requested_by}`)
+    ];
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(new Blob([lines.join("\n")],{type:"text/plain"}));
+    a.download=`${proj.name.replace(/\s+/g,"_")}.txt`;
+    a.click();
+    notify("📄 Exported TXT");
+  }
+
+  const pendingCRs=(proj?.changeRequests||[]).filter(c=>c.status==="pending");
+  const fcrs=(proj?.changeRequests||[]).filter(c=>{
+    return(filter==="all"||c.status===filter)&&(!search||(c.description||"").toLowerCase().includes(search.toLowerCase())||(c.requestedBy||c.requested_by||"").toLowerCase().includes(search.toLowerCase()));
+  });
+  const visiblePendingIds=fcrs.filter(c=>c.status==="pending").map(c=>c.id);
+  const allVisiblePendingSelected=visiblePendingIds.length>0&&visiblePendingIds.every(id=>selected.has(id));
+
+  const totalPending=projects.reduce((a,p)=>a+(p?.changeRequests||[]).filter(c=>c.status==="pending").length,0);
+  const H={fontFamily:"'Syne',sans-serif",fontWeight:800};
+
+  return(
+    <><OfflineBanner/>
+    <div className="app-shell">
+      {toast&&<Toast msg={toast} onDone={()=>setToast(null)}/>}
+      {undoState&&<UndoBar msg={undoState.msg} onUndo={doUndo} onDone={()=>setUndoState(null)}/>}
+
+      {/* MODALS */}
+      {modal==="share"&&proj&&<ShareModal proj={proj} brand={brand} onClose={()=>setModal(null)}/>}
+      {modal==="invoice"&&proj&&<InvoiceModal proj={proj} onClose={()=>setModal(null)}/>}
+      {modal==="keys"&&<KeyboardHelp onClose={()=>setModal(null)}/>}
+      {modal==="audit"&&proj&&<AuditLogModal proj={proj} onClose={()=>setModal(null)}/>}
+      {modal==="bug"&&(
+        <Modal title="🐛 Report a Bug" onClose={()=>setModal(null)}>
+          <textarea placeholder="What went wrong? Steps to reproduce..." style={{minHeight:100,marginBottom:14}}/>
+          <button className="btn-p" style={{width:"100%",padding:11}} onClick={()=>{setModal(null);notify("🙏 Bug reported — thanks!");}}>Send Report</button>
+        </Modal>
+      )}
+      {modal&&modal.startsWith("cr_")&&proj&&(()=>{
+        const crId=modal.replace("cr_","");
+        const cr=(proj?.changeRequests||[]).find(c=>c.id===crId);
+        if(!cr)return null;
+        return <CRCommentsModal cr={cr} projId={proj.id} user={user} onClose={()=>setModal(null)}/>;
+      })()}
+
+      
+      {/* ── SIDEBAR ── */}
+      <aside className={`sidebar${mobileMenuOpen?" mobile-open":""}`}>
+        <div className="sidebar-header" onClick={()=>{setView("dash");setMobileMenuOpen(false);}} style={{cursor:"pointer"}}>
+          <div style={{width:32,height:32,background:"linear-gradient(135deg,#7C3AED,#00F5D4)",borderRadius:9,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0,boxShadow:"0 0 12px rgba(124,58,237,0.4)"}}>{brand.logo||"🔒"}</div>
+          <div>
+            <div style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:15}}>Scope<span style={{backgroundImage:"linear-gradient(135deg,#7C3AED,#00F5D4)",WebkitBackgroundClip:"text",backgroundClip:"text",WebkitTextFillColor:"transparent",color:"transparent"}}>Lock</span></div>
+            {brand.company&&<div style={{fontSize:9,color:"var(--muted)"}}>{brand.company}</div>}
+          </div>
+        </div>
+        <div style={{flex:1,overflowY:"auto",padding:"10px 0"}}>
+          <div className="sidebar-section">Main</div>
+          <button className={`sidebar-item${view==="dash"?" active":""}`} onClick={()=>{setView("dash");setMobileMenuOpen(false);}}>
+            <span className="s-icon">⊞</span> Dashboard
+            {totalPending>0&&<span className="s-badge">{totalPending}</span>}
+          </button>
+          <button className={`sidebar-item${view==="analytics"?" active":""}`} onClick={()=>{setView("analytics");setMobileMenuOpen(false);}}>
+            <span className="s-icon">📊</span> Analytics
+          </button>
+          <div className="sidebar-section" style={{marginTop:8}}>Projects</div>
+          {projects.slice(0,7).map(p=>(
+            <button key={p.id} className={`sidebar-item${pid===p.id&&view==="proj"?" active":""}`}
+              onClick={()=>{setPid(p.id);setView("proj");setFilter("all");setSearch("");}}>
+              <span className="s-icon" style={{fontSize:7,color:"var(--teal)"}}>●</span>
+              <span style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:138,fontSize:12}}>{p.name}</span>
+            </button>
+          ))}
+          {projects.length>7&&<div style={{fontSize:10,color:"var(--muted)",padding:"4px 22px"}}>+{projects.length-7} more…</div>}
+          <button className={`sidebar-item${view==="np"?" active":""}`} onClick={()=>{setView("np");setMobileMenuOpen(false);}} style={{color:"var(--teal)"}}>
+            <span className="s-icon">＋</span> New Project
+          </button>
+          <div className="sidebar-section" style={{marginTop:8}}>Account</div>
+          <button className={`sidebar-item${view==="billing"?" active":""}`} onClick={()=>{setView("billing");setMobileMenuOpen(false);}}>
+            <span className="s-icon">💳</span> Billing
+          </button>
+          <button className={`sidebar-item${view==="brand"?" active":""}`} onClick={()=>{setView("brand");setMobileMenuOpen(false);}}>
+            <span className="s-icon">🎨</span> Branding
+          </button>
+          <button className="sidebar-item" onClick={()=>setModal("keys")}>
+            <span className="s-icon">⌨️</span> Shortcuts
+          </button>
+          <button className="sidebar-item" onClick={()=>setModal("bug")}>
+            <span className="s-icon">🐛</span> Report Bug
+          </button>
+        </div>
+        <div className="sidebar-footer">
+          <a href="https://scopelock-rei.netlify.app" style={{display:"flex",alignItems:"center",gap:8,padding:"10px 16px",color:"var(--muted)",fontSize:12,fontFamily:"'JetBrains Mono',monospace",textDecoration:"none",borderRadius:8,marginBottom:4,transition:"all 0.2s"}} onMouseEnter={e=>e.currentTarget.style.color="var(--teal)"} onMouseLeave={e=>e.currentTarget.style.color="var(--muted)"}>
+              <span>🏠</span><span>Back to Home</span>
+            </a>
+            <div className="sidebar-user" onClick={async()=>{if(window.confirm("Sign out?"))await supabase.auth.signOut();}}>
+            <div className="sidebar-avatar">{(user.user_metadata?.full_name||user.email||"U")[0].toUpperCase()}</div>
+            <div style={{overflow:"hidden",flex:1}}>
+              <div style={{fontSize:12,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{user.user_metadata?.full_name||(user.email||"").split("@")[0]}</div>
+              <div style={{fontSize:10,color:"var(--muted)"}}>Sign out</div>
+            </div>
+          </div>
+          <button onClick={()=>setDarkMode(d=>!d)} style={{width:"100%",marginTop:8,background:"var(--surface2)",border:"1px solid var(--border)",borderRadius:8,color:"var(--muted)",fontSize:11,padding:"7px 10px"}}>
+            {darkMode?"☀️ Light mode":"🌙 Dark mode"}
+          </button>
+        </div>
+      </aside>
+
+      {/* ── MAIN CONTENT ── */}
+      <div className="main-content">
+
+        {/* TOPBAR */}
+        <div className="topbar">
+          <div style={{display:"flex",alignItems:"center",gap:8}}>
+            <button className="mobile-menu-btn" onClick={()=>setMobileMenuOpen(m=>!m)}>☰</button>
+            <span style={{fontSize:12,color:"var(--muted)",display:"flex",alignItems:"center",gap:6}}>
+              {view==="dash"&&<><span style={{color:"var(--text)",fontWeight:600}}>Dashboard</span></>}
+              {view==="analytics"&&<span style={{color:"var(--text)",fontWeight:600}}>Analytics</span>}
+              {view==="billing"&&<span style={{color:"var(--text)",fontWeight:600}}>Billing</span>}
+              {view==="brand"&&<span style={{color:"var(--text)",fontWeight:600}}>Branding</span>}
+              {view==="np"&&<span style={{color:"var(--text)",fontWeight:600}}>New Project</span>}
+              {view==="ncr"&&<><span onClick={()=>setView("proj")} style={{cursor:"pointer",color:"var(--muted)"}}>← {proj?.name}</span><span style={{color:"var(--text)",fontWeight:600,marginLeft:6}}>· New CR</span></>}
+              {view==="proj"&&proj&&<><span onClick={()=>{setView("dash");setMobileMenuOpen(false);}} style={{cursor:"pointer"}}>Projects</span><span style={{margin:"0 6px",opacity:0.35}}>/</span><span style={{color:"var(--text)",fontWeight:600}}>{proj.name}</span></>}
+            </span>
+          </div>
+          <div style={{display:"flex",gap:6,alignItems:"center"}}>
+            {totalPending>0&&<span style={{background:"rgba(241,65,108,0.1)",color:"var(--red)",border:"1px solid rgba(241,65,108,0.25)",borderRadius:100,padding:"3px 10px",fontSize:11,fontWeight:700}}>⚠ {totalPending}</span>}
+            {proj&&view==="proj"&&<>
+              <button className="btn-g" onClick={()=>setModal("share")} style={{fontSize:11}}>🔗 Share</button>
+              <button className="btn-g hide-mobile" onClick={()=>setModal("invoice")} style={{fontSize:11}}>🧾 Invoice</button>
+              <button className="btn-g hide-mobile" onClick={exportTxt} style={{fontSize:11}}>↓ TXT</button>
+              <button className="btn-g hide-mobile" onClick={exportCSV} style={{fontSize:11}}>↓ CSV</button>
+              <button className="btn-p" onClick={()=>setView("ncr")} style={{fontSize:11,padding:"7px 14px"}}>+ CR</button>
+            </>}
+            {view==="dash"&&<button className="btn-p" onClick={()=>{setView("np");setMobileMenuOpen(false);}} style={{fontSize:11,padding:"7px 14px"}}>+ Project</button>}
+            {(view==="np"||view==="ncr")&&<button className="btn-g" onClick={()=>setView(view==="np"?"dash":"proj")} style={{fontSize:11}}>← Back</button>}
+          </div>
+        </div>
+
+      <main style={{padding:"28px 32px",flex:1,maxWidth:1100}}>
+
+        {/* ── DASHBOARD ── */}
+        {view==="dash"&&(
+          <div className="fade">
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:24,flexWrap:"wrap",gap:12}}>
+              <div>
+                <h1 style={{...H,fontSize:26,letterSpacing:"-0.03em",marginBottom:3}}>Projects</h1>
+                <p style={{color:"var(--muted)",fontSize:12}}>Lock scope. Track changes. Ship on time.</p>
+              </div>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:10,marginBottom:24}} className="full-mobile">
+              {[
+                {label:"Projects",value:projects.length,color:"#F59E0B"},
+                {label:"Pending",value:totalPending,color:totalPending>0?"#F97316":"var(--muted)"},
+                {label:"Approved",value:projects.reduce((a,p)=>a+(p?.changeRequests||[]).filter(c=>c.status==="approved").length,0),color:"#10B981"},
+                {label:"Urgent",value:projects.reduce((a,p)=>a+(p?.changeRequests||[]).filter(c=>c.status==="pending"&&c.priority==="urgent").length,0),color:"#EF4444"},
+              ].map(s=>(
+                <div key={s.label} className="card" style={{padding:"16px 18px"}}>
+                  <div className="lbl">{s.label}</div>
+                  <div style={{fontSize:30,fontWeight:700,color:s.color,lineHeight:1,marginTop:3}}>{s.value}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{display:"grid",gap:10}}>
+              {authLoading?[1,2,3].map(i=>(
+                <div key={i} className="card skeleton-card skeleton" style={{padding:"18px 22px"}}/>
+              )):projects.map(p=>{
+                const d=getDrift(p.changeRequests||[]);
+                const h=getHealth(p);
+                const dl=daysLeft(p.dueDate||p.due_date);
+                const dlColor=dl===null?"":dl>14?"#10B981":dl>7?"#F59E0B":"#EF4444";
+                return(
+                  <div key={p.id} className="card" style={{padding:"18px 22px",cursor:"pointer",display:"grid",gridTemplateColumns:"1fr auto",gap:14,alignItems:"center",transition:"border-color 0.2s"}}
+                    onClick={()=>{setPid(p.id);setView("proj");setFilter("all");setSearch("");}}
+                    onMouseEnter={e=>e.currentTarget.style.borderColor="var(--amber)"}
+                    onMouseLeave={e=>e.currentTarget.style.borderColor="var(--border)"}
+                  >
+                    <div>
+                      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6,flexWrap:"wrap"}}>
+                        <div style={{width:7,height:7,borderRadius:"50%",background:d.color,flexShrink:0}}/>
+                        <span style={{...H,fontSize:15}}>{p.name||"Untitled"}</span>
+                        <span style={{fontSize:10,color:"var(--muted)",background:"var(--surface2)",padding:"2px 8px",borderRadius:4}}>{p.client||p.client_name||"Internal"}</span>
+                        {dl!==null&&<span style={{fontSize:10,fontWeight:700,color:dlColor}}>{dl>0?`📅 ${dl}d left`:`🔴 ${Math.abs(dl)}d over`}</span>}
+                        {(p?.changeRequests||[]).some(c=>c.priority==="urgent"&&c.status==="pending")&&<span className="tag-u">URGENT</span>}
+                      </div>
+                      <p style={{color:"var(--muted)",fontSize:11,lineHeight:1.5,marginBottom:8}}>{(p.baseline||"").length>100?(p.baseline||"").slice(0,100)+"…":(p.baseline||"")}</p>
+                      <div style={{display:"flex",gap:14,fontSize:10,color:"var(--muted)",flexWrap:"wrap"}}>
+                        <span>📋 {(p?.changeRequests||[]).length} CR{(p?.changeRequests||[]).length!==1?"s":""}</span>
+                        <span>⏳ {(p?.changeRequests||[]).filter(c=>c.status==="pending").length} pending</span>
+                        <span>⏳ {(p?.changeRequests||[]).filter(c=>c.status==="pending").length} pending</span>
+                      </div>
+                    </div>
+                    <div style={{display:"flex",gap:10,alignItems:"center"}}>
+                      <HealthRing score={h.score} color={h.color} label={h.label}/>
+                      <div style={{textAlign:"right",minWidth:90}}>
+                        <div className="lbl">Drift</div>
+                        <div style={{color:d.color,fontWeight:700,fontSize:20}}>{d.pct}%</div>
+                        <div style={{fontSize:9,color:d.color}}>{d.level}</div>
+                        <div className="dbar"><div style={{height:"100%",width:`${d.pct}%`,background:d.color,borderRadius:3,transition:"width 0.5s"}}/></div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+              {!projects.length&&(
+                <div className="card" style={{padding:"50px 24px",textAlign:"center",color:"var(--muted)"}}>
+                  <div style={{fontSize:36,marginBottom:10}}>🔒</div>
+                  <p style={{marginBottom:16}}>No projects yet.</p>
+                  <button className="btn-p" onClick={()=>{setView("np");setMobileMenuOpen(false);}}>+ Create First Project</button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ── NEW PROJECT ── */}
+        {view==="np"&&(
+          <div className="fade" style={{maxWidth:560,margin:"0 auto"}}>
+            <h2 style={{...H,fontSize:22,marginBottom:5}}>Lock New Scope</h2>
+            <p style={{color:"var(--muted)",fontSize:12,marginBottom:24}}>Once locked, all changes require formal approval.</p>
+            <div className="card" style={{padding:26}}>
+              <div style={{display:"grid",gap:16}}>
+                <div><div className="lbl">Use a Template</div>
+                  <select value={ptpl} onChange={e=>{setPtpl(e.target.value);const t=PT.find(t=>t.name===e.target.value);if(t)setNp(p=>({...p,name:t.name,baseline:t.baseline}));}}>
+                    <option value="">— Start from scratch —</option>
+                    {PT.map(t=><option key={t.name}>{t.name}</option>)}
+                  </select>
+                </div>
+                <div style={{height:1,background:"var(--border)"}}/>
+                <div><div className="lbl">Project Name *</div><input placeholder="Client Portal Redesign" value={np.name} maxLength={60} onChange={e=>{setNp(p=>({...p,name:e.target.value}));setHasUnsaved(true);}}/></div>
+                <div><div className="lbl">Client / Team</div><input placeholder="e.g. Maria Santos / Acme Corp" value={np.client} maxLength={60} onChange={e=>setNp(p=>({...p,client:e.target.value}))}/></div>
+                <div>
+                  <div style={{display:"flex",gap:6,alignItems:"center",marginBottom:5}}>
+                    <div className="lbl" style={{marginBottom:0}}>Scope Baseline *</div>
+                    <div className="tip"><span style={{color:"var(--muted)",fontSize:10,cursor:"help"}}>ⓘ</span><div className="tip-box">Write exactly what is IN scope. Also mention what is NOT included. The more specific, the better.</div></div>
+                  </div>
+                  <textarea placeholder="What's included. What's excluded. Be specific." value={np.baseline} onChange={e=>setNp(p=>({...p,baseline:e.target.value}))} style={{minHeight:110}}/>
+                </div>
+                <div><div className="lbl">Due Date</div><input type="date" value={np.dueDate} onChange={e=>setNp(p=>({...p,dueDate:e.target.value}))}/>
+                {np.dueDate&&new Date(np.dueDate)<new Date(new Date().toDateString())&&<div style={{fontSize:11,color:"#F59E0B",marginTop:4,fontFamily:"'JetBrains Mono',monospace"}}>⚠️ This date is in the past</div>}
+              </div>
+                <div style={{background:"var(--surface2)",borderRadius:7,padding:"11px 15px",display:"flex",gap:9,fontSize:12,color:"var(--muted)",lineHeight:1.6}}>
+                  <span>⚠️</span><span>Once locked this baseline cannot be edited. All changes must go through formal approval.</span>
+                </div>
+                <button className="btn-p" style={{padding:"11px",fontSize:13}} onClick={createProject}>🔒 Lock Scope & Create Project</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── PROJECT DETAIL ── */}
+        {view==="proj"&&!proj&&<div style={{textAlign:'center',padding:60}}><Spinner/><p style={{color:'var(--muted)',fontSize:12,marginTop:12}}>Loading project…</p></div>}
+        {view==="proj"&&proj&&(()=>{
+          const crs=proj?.changeRequests||[];
+          const d=getDrift(crs);
+          const h=getHealth(proj);
+          const dl=daysLeft(proj.dueDate||proj.due_date);
+          const dlColor=dl===null?"":dl>14?"#10B981":dl>7?"#F59E0B":"#EF4444";
+          const selectedPendingCount=[...selected].filter(id=>crs.find(c=>c.id===id&&c.status==="pending")).length;
+          return(
+            <div className="fade">
+              <div style={{display:"flex",gap:6,marginBottom:18,color:"var(--muted)",fontSize:11,alignItems:"center"}}>
+                <span onClick={()=>{setView("dash");setMobileMenuOpen(false);}} style={{cursor:"pointer"}}>← Dashboard</span>
+                <span>/</span><span style={{color:"var(--text)"}}>{proj.name}</span>
+              </div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr auto",alignItems:"start",gap:16,marginBottom:20}} className="stack-mobile">
+                <div>
+                  <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:5,flexWrap:"wrap"}}>
+                    <h1 style={{...H,fontSize:22}}>{proj.name}</h1>
+                    <span style={{fontSize:10,color:"var(--muted)",background:"var(--surface2)",padding:"2px 8px",borderRadius:4}}>{proj.client}</span>
+                    {dl!==null&&<span style={{fontSize:10,fontWeight:700,color:dlColor}}>{dl>0?`📅 ${dl}d left`:`🔴 ${Math.abs(dl)}d overdue`}</span>}
+                  </div>
+                  <p style={{color:"var(--muted)",fontSize:11}}>Created {proj.createdAt}{proj.dueDate?` · Due ${fmtDate(proj.dueDate)}`:""}</p>
+                </div>
+                <div style={{display:"flex",gap:10,alignItems:"flex-start",flexWrap:"wrap",justifyContent:"flex-end"}}>
+                  <div className="card" style={{padding:"14px 18px",textAlign:"center",minWidth:100}}>
+                    <div className="lbl">Drift</div>
+                    <div style={{fontSize:26,fontWeight:700,color:d.color,lineHeight:1}}>{d.pct}%</div>
+                    <div style={{fontSize:9,color:d.color,marginTop:2}}>{d.level}</div>
+                    <div className="dbar"><div style={{height:"100%",width:`${d.pct}%`,background:d.color,borderRadius:3}}/></div>
+                  </div>
+                  <div className="card" style={{padding:"14px 18px",minWidth:120}}>
+                    <DriftChart history={proj.driftHistory}/>
+                  </div>
+                  <div className="card" style={{padding:"14px 18px",textAlign:"center"}}>
+                    <HealthRing score={h.score} color={h.color} label={h.label}/>
+                    <div style={{fontSize:9,color:"var(--muted)",marginTop:4}}>Health</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="card" style={{padding:"16px 20px",marginBottom:18,borderLeft:"3px solid #10B981"}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+                  <div className="lbl">🔒 Locked Scope Baseline</div>
+                  <div style={{display:"flex",gap:6}}>
+                    <span style={{fontSize:9,color:"#10B981",background:"#00231A",padding:"2px 8px",borderRadius:3,border:"1px solid #065F46"}}>LOCKED</span>
+                    <button className="btn-g no-print hide-mobile" style={{fontSize:10,padding:"3px 10px"}} onClick={()=>setModal("invoice")}>🧾 Invoice</button>
+                  </div>
+                </div>
+                <p style={{fontSize:12,lineHeight:1.8,color:"var(--text)"}}>{proj.baseline||""}</p>
+              </div>
+
+              {/* ── CR Header with bulk controls ── */}
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12,flexWrap:"wrap",gap:10}}>
+                <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
+                  <h2 style={{...H,fontSize:17}}>Change Requests <span style={{color:"var(--muted)",fontWeight:400,fontSize:13}}>({crs.length})</span></h2>
+                  {/* ── Select-all pending toggle ── */}
+                  {pendingCRs.length>0&&(
+                    <button onClick={()=>{
+                      if(allVisiblePendingSelected){setSelected(new Set());}
+                      else{setSelected(new Set(visiblePendingIds));}
+                    }} style={{fontSize:10,padding:"3px 10px",borderRadius:5,border:`1px solid ${allVisiblePendingSelected?"var(--amber)":"var(--border)"}`,background:allVisiblePendingSelected?"rgba(245,158,11,0.1)":"transparent",color:allVisiblePendingSelected?"var(--amber)":"var(--muted)",cursor:"pointer"}}>
+                      {allVisiblePendingSelected?"✓ All selected":"Select pending"}
+                    </button>
+                  )}
+                </div>
+                <div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap"}}>
+                  <div style={{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:6,padding:"6px 10px",display:"flex",alignItems:"center",gap:6}}>
+                    <span style={{color:"var(--muted)",fontSize:11}}>🔍</span>
+                    <input ref={searchRef} placeholder="Search…" value={search} onChange={e=>setSearch(e.target.value)} style={{background:"transparent",border:"none",padding:0,fontSize:12,width:120,color:"var(--text)"}}/>
+                  </div>
+                  {["all","pending","approved","rejected"].map(f=>(
+                    <button key={f} onClick={()=>setFilter(f)} style={{background:filter===f?"var(--amber)":"transparent",color:filter===f?"#000":"var(--muted)",border:`1px solid ${filter===f?"var(--amber)":"var(--border)"}`,padding:"5px 10px",borderRadius:5,fontSize:10,fontWeight:600,cursor:"pointer",textTransform:"capitalize"}}>{f}</button>
+                  ))}
+                </div>
+              </div>
+
+              {/* ── Bulk action bar — appears when items are selected ── */}
+              {selectedPendingCount>0&&(
+                <div style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.3)",borderRadius:8,padding:"10px 16px",marginBottom:12,display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
+                  <span style={{fontSize:12,color:"var(--amber)",fontWeight:700}}>{selectedPendingCount} pending CR{selectedPendingCount>1?"s":""} selected</span>
+                  <div style={{display:"flex",gap:8,marginLeft:"auto"}}>
+                    <button className="btn-ok" style={{fontSize:11,padding:"5px 14px"}} onClick={()=>bulkSetStatus("approved")}>✓ Approve All</button>
+                    <button className="btn-no" style={{fontSize:11,padding:"5px 14px"}} onClick={()=>bulkSetStatus("rejected")}>✕ Reject All</button>
+                    <button className="btn-g" style={{fontSize:10,padding:"4px 10px"}} onClick={()=>setSelected(new Set())}>Clear</button>
+                  </div>
+                </div>
+              )}
+
+              <div style={{display:"grid",gap:8}}>
+                {fcrs.map(cr=>{
+                  const s=SC[cr.status]||SC.pending;
+                  const ic=IC[(cr.impact||"").split(" —")[0]]||"var(--muted)";
+                  const isSelected=selected.has(cr.id);
+                  return(
+                    <div key={cr.id} className="card" style={{padding:"14px 18px",border:`1px solid ${isSelected?"var(--amber)":"var(--border)"}`,background:isSelected?"rgba(245,158,11,0.04)":"var(--surface)"}}>
+                      <div style={{display:"grid",gridTemplateColumns:"auto 1fr auto",gap:10,alignItems:"start"}}>
+                        {/* ── Checkbox (only for pending) ── */}
+                        {cr.status==="pending"?(
+                          <div className={`cr-check${isSelected?" checked":""}`} onClick={()=>{
+                            setSelected(prev=>{const n=new Set(prev);isSelected?n.delete(cr.id):n.add(cr.id);return n;});
+                          }}>
+                            {isSelected&&<span style={{color:"#000",fontSize:10,fontWeight:900}}>✓</span>}
+                          </div>
+                        ):<div style={{width:16}}/>}
+                        <div>
+                          <div style={{display:"flex",gap:6,alignItems:"center",marginBottom:7,flexWrap:"wrap"}}>
+                            <span style={{fontSize:9,fontWeight:700,padding:"2px 7px",borderRadius:3,background:s.bg,color:s.text,border:`1px solid ${s.border}`}}>{s.label.toUpperCase()}</span>
+                            {cr.priority==="urgent"?<span className="tag-u">URGENT</span>:<span className="tag-n">normal</span>}
+                            <span style={{fontSize:10,color:ic}}>⚡ {cr.impact}</span>
+                            {cr.autoRejected&&<span style={{fontSize:9,color:"#EF4444",background:"#2A0A0A",padding:"2px 7px",borderRadius:3}}>AUTO-REJECTED (30d)</span>}
+                          </div>
+                          <p style={{fontSize:12,marginBottom:5,lineHeight:1.5}}>{cr.description}</p>
+                          {(cr.hours||cr.charge)&&(
+                            <div style={{display:"flex",gap:10,marginBottom:5}}>
+                              {cr.hours&&<span style={{fontSize:10,background:"rgba(129,140,248,0.1)",color:"var(--blue)",border:"1px solid rgba(129,140,248,0.2)",borderRadius:5,padding:"2px 8px"}}>🕐 {cr.hours}h</span>}
+                              {cr.charge&&<span style={{fontSize:10,background:"rgba(0,245,212,0.08)",color:"var(--teal)",border:"1px solid rgba(0,245,212,0.2)",borderRadius:5,padding:"2px 8px"}}>💰 +{Number(cr.charge||0).toLocaleString()} {brand?.currency||"USD"}</span>}
+                            </div>
+                          )}
+                          {cr.status==="rejected"&&(cr.rejection_reason||cr.rejectionReason)&&(
+                            <div style={{marginTop:5,background:"rgba(241,65,108,0.06)",border:"1px solid rgba(241,65,108,0.2)",borderRadius:6,padding:"6px 10px",fontSize:11,color:"var(--red)"}}>
+                              ❌ {cr.rejection_reason||cr.rejectionReason}
+                            </div>
+                          )}
+                          <div style={{fontSize:10,color:"var(--muted)"}}>
+                            By <span style={{color:"var(--text)"}}>{cr.requestedBy}</span> · {cr.createdAt}
+                            {(cr.comments||[]).length>0&&<span style={{marginLeft:8}}>💬 {(cr.comments||[]).length}</span>}
+                          </div>
+                        </div>
+                        <div style={{display:"flex",flexDirection:"column",gap:5,alignItems:"flex-end"}}>
+                          {cr.status==="pending"&&<>
+                            <button className="btn-ok" onClick={()=>setStatus(cr.id,"approved")}>✓ Approve</button>
+                            <button className="btn-no" onClick={()=>setStatus(cr.id,"rejected")}>✕ Reject</button>
+                          </>}
+                          <button className="btn-g" style={{fontSize:9,padding:"3px 9px"}} onClick={()=>setModal(`cr_${cr.id}`)}>💬 Comments</button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+                {!fcrs.length&&(
+                  <div className="card" style={{padding:"32px 24px",textAlign:"center",color:"var(--muted)"}}>
+                    {search?"No results match.":filter==="all"?"No change requests yet.":`No ${filter} requests.`}
+                  </div>
+                )}
+              </div>
+
+              <div style={{marginTop:36,paddingTop:20,borderTop:"1px solid var(--border)",display:"flex",gap:10,flexWrap:"wrap"}}>
+                <button className="btn-g" style={{fontSize:11}} onClick={exportTxt}>↓ TXT</button>
+                <button className="btn-g" style={{fontSize:11}} onClick={exportCSV}>↓ CSV</button>
+                <button className="btn-g" style={{fontSize:11}} onClick={()=>setModal("invoice")}>🧾 Invoice</button>
+                <button className="btn-g" style={{fontSize:11}} onClick={()=>setModal("share")}>🔗 Share</button>
+                {/* ── Audit log button ── */}
+                <button className="btn-g" style={{fontSize:11}} onClick={()=>setModal("audit")}>📋 Audit Log</button>
+                <button onClick={()=>deleteProject(proj.id)} style={{marginLeft:"auto",background:"transparent",color:"#EF4444",border:"1px solid #7F1D1D",padding:"6px 14px",borderRadius:5,fontSize:11,cursor:"pointer"}}>🗑 Delete</button>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* ── NEW CHANGE REQUEST ── */}
+        {view==="ncr"&&proj&&(
+          <div className="fade" style={{maxWidth:560,margin:"0 auto"}}>
+            <h2 style={{...H,fontSize:22,marginBottom:5}}>Submit Change Request</h2>
+            <p style={{color:"var(--muted)",fontSize:12,marginBottom:18}}>Project: <span style={{color:"var(--amber)"}}>{proj.name}</span></p>
+            <div className="card" style={{padding:"12px 16px",marginBottom:18,borderLeft:"3px solid #10B981"}}>
+              <div className="lbl">Locked Baseline</div>
+              <p style={{fontSize:11,color:"var(--muted)",lineHeight:1.6,marginTop:3}}>{proj.baseline||""}</p>
+            </div>
+            <div className="card" style={{padding:26}}>
+              <div style={{display:"grid",gap:16}}>
+                <div><div className="lbl">Template</div>
+                  <select value={crtpl} onChange={e=>{setCrtpl(e.target.value);if(e.target.value)setNcr(c=>({...c,description:e.target.value}));}}>
+                    <option value="">— From scratch —</option>
+                    {CRT.map(t=><option key={t}>{t}</option>)}
+                  </select>
+                </div>
+                <div style={{height:1,background:"var(--border)"}}/>
+                <div><div className="lbl">Description *</div><textarea placeholder="e.g. Add user authentication module with email login, Google OAuth, and password reset. Affects backend API and frontend login page." value={ncr.description} onChange={e=>setNcr(c=>({...c,description:e.target.value}))}/></div>
+                <div><div className="lbl">Estimated Impact</div>
+                  <select value={ncr.impact} onChange={e=>setNcr(c=>({...c,impact:e.target.value}))}>
+                    <option value="Low">Low — minor, &lt;1 day</option>
+                    <option value="Medium">Medium — a few days</option>
+                    <option value="High">High — 3+ days, affects timeline</option>
+                    <option value="Very High">Very High — major expansion</option>
+                  </select>
+                </div>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+                  <div>
+                    <div className="lbl">Est. Additional Hours</div>
+                    <input type="number" min="0" placeholder="e.g. 8" value={ncr.hours||""} onChange={e=>setNcr(c=>({...c,hours:e.target.value}))} style={{fontSize:13}}/>
+                  </div>
+                  <div>
+                    <div className="lbl">Additional Charge ({brand?.currency||"USD"})</div>
+                    <input type="number" min="0" placeholder="e.g. 500" value={ncr.charge||""} onChange={e=>setNcr(c=>({...c,charge:e.target.value}))} style={{fontSize:13}}/>
+                  </div>
+                </div>
+                <div>
+                  <div className="lbl">Priority</div>
+                  <div style={{display:"flex",gap:8}}>
+                    {["normal","urgent"].map(p=>(
+                      <button key={p} onClick={()=>setNcr(c=>({...c,priority:p}))} style={{flex:1,padding:8,borderRadius:6,fontSize:11,fontWeight:700,border:`1px solid ${ncr.priority===p?p==="urgent"?"#EF4444":"#10B981":"var(--border)"}`,background:ncr.priority===p?p==="urgent"?"rgba(239,68,68,.1)":"rgba(16,185,129,.1)":"transparent",color:ncr.priority===p?p==="urgent"?"#EF4444":"#10B981":"var(--muted)"}}>
+                        {p==="urgent"?"🔴 Urgent":"🟢 Normal"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div><div className="lbl">Requested By *</div><input placeholder="Client (John) or Dev Team" value={ncr.requestedBy} onChange={e=>setNcr(c=>({...c,requestedBy:e.target.value}))}/></div>
+                <button className="btn-p" style={{padding:"11px",fontSize:13}} onClick={submitCR}>Submit for Approval</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {view==="analytics"&&<AnalyticsView projects={projects}/>}
+        {view==="billing"&&<BillingView plan={plan} setPlan={p=>{setPlan(p);notify(`✅ Switched to ${p} plan`);}}/>}
+        {view==="brand"&&<BrandSettings brand={brand} setBrand={setBrand} onSave={async()=>{if(isConfigured&&user){const{error}=await supabase.from("user_profiles").upsert({user_id:user.id,brand,plan},{onConflict:"user_id"});if(error)return notify("❌ Failed to save.");}notify("✅ Branding saved!");}}/>}
+
+      </main>
+
+      <footer style={{borderTop:"1px solid var(--border)",padding:"14px 32px",display:"flex",justifyContent:"space-between",alignItems:"center",fontSize:10,color:"var(--muted)"}}>
+        <span>ScopeLock v5 · {brand.company||"Your Company"}</span>
+        <button onClick={()=>setModal("bug")} style={{background:"transparent",border:"none",color:"var(--muted)",fontSize:10,cursor:"pointer"}}>🐛 Report Bug</button>
+      </footer>
+      </div>{/* end main-content */}
+    </div></>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+
+<!-- ═══════════════════════════════════════════════
+  📋 SUPABASE SQL SETUP — Run this in Supabase SQL Editor
+  supabase.com → Your Project → SQL Editor → New Query
+═══════════════════════════════════════════════
+
+-- 1. PROJECTS
+create table projects (
+  id uuid primary key default gen_random_uuid(),
+  owner_id uuid references auth.users(id) on delete cascade not null,
+  name text not null,
+  client_name text default 'Internal',
+  baseline text not null,
+  due_date date,
+  drift_history jsonb default '[0]',
+  created_at timestamptz default now()
+);
+alter table projects enable row level security;
+create policy "Users manage own projects" on projects for all using (auth.uid() = owner_id);
+
+-- 2. CHANGE REQUESTS
+create table change_requests (
+  id uuid primary key default gen_random_uuid(),
+  project_id uuid references projects(id) on delete cascade not null,
+  description text not null,
+  impact text default 'Low — estimated',
+  requested_by text not null,
+  status text default 'pending' check (status in ('pending','approved','rejected')),
+  priority text default 'normal' check (priority in ('normal','urgent')),
+  created_at timestamptz default now()
+);
+alter table change_requests enable row level security;
+create policy "Users manage own CRs" on change_requests for all
+  using (project_id in (select id from projects where owner_id = auth.uid()));
+
+-- 3. AUDIT LOGS
+create table audit_logs (
+  id uuid primary key default gen_random_uuid(),
+  project_id uuid references projects(id) on delete cascade not null,
+  action text not null,
+  actor text not null,
+  detail text,
+  created_at timestamptz default now()
+);
+alter table audit_logs enable row level security;
+create policy "Users view own audit logs" on audit_logs for all
+  using (project_id in (select id from projects where owner_id = auth.uid()));
+
+-- 4. USER PROFILES (brand + plan settings)
+create table user_profiles (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  brand jsonb default '{"company":"","tagline":"","color":"#F59E0B","logo":"🔒"}',
+  plan text default 'free',
+  updated_at timestamptz default now()
+);
+alter table user_profiles enable row level security;
+create policy "Users manage own profile" on user_profiles for all using (auth.uid() = user_id);
+
+-- 5. Enable Google OAuth:
+--    Supabase Dashboard → Authentication → Providers → Google → Enable
+--    Add Google OAuth Client ID + Secret
+--    (Get from console.cloud.google.com → APIs & Services → Credentials)
+--    Set Authorized redirect URI to: https://YOUR-PROJECT.supabase.co/auth/v1/callback
+
+═══════════════════════════════════════════════ -->
+</body>
+</html>
