@@ -3403,6 +3403,9 @@ function App(){
     }
   },[np]);
 
+  const [ncr,setNcr]=useState({description:"",impact:"Low",requestedBy:"",priority:"normal"});
+  const [ncrErrors,setNcrErrors]=useState({});
+
   // Auto-save NCR draft to localStorage
   React.useEffect(()=>{
     if(ncr.description||ncr.requestedBy){
@@ -3417,8 +3420,6 @@ function App(){
       if(d){const p=JSON.parse(d);if(p.name||p.baseline)setNp(p);}
     }catch(e){}
   },[]);
-  const [ncr,setNcr]=useState({description:"",impact:"Low",requestedBy:"",priority:"normal"});
-  const [ncrErrors,setNcrErrors]=useState({});
   const [editingCrId,setEditingCrId]=useState(null);
   const [editCrForm,setEditCrForm]=useState({});
   const [toast,setToast]=useState(null);

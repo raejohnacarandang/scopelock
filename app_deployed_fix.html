@@ -1649,7 +1649,7 @@ function App(){
           </button>
         </div>
         <div className="sidebar-footer">
-          <a href="https://scopelock-rei.netlify.app" style={{display:"flex",alignItems:"center",gap:8,padding:"10px 16px",color:"var(--muted)",fontSize:12,fontFamily:"'JetBrains Mono',monospace",textDecoration:"none",borderRadius:8,marginBottom:4,transition:"all 0.2s"}} onMouseEnter={e=>e.currentTarget.style.color="var(--teal)"} onMouseLeave={e=>e.currentTarget.style.color="var(--muted)"}>
+          <a href="https://scopelock-app.netlify.app" style={{display:"flex",alignItems:"center",gap:8,padding:"10px 16px",color:"var(--muted)",fontSize:12,fontFamily:"'JetBrains Mono',monospace",textDecoration:"none",borderRadius:8,marginBottom:4,transition:"all 0.2s"}} onMouseEnter={e=>e.currentTarget.style.color="var(--teal)"} onMouseLeave={e=>e.currentTarget.style.color="var(--muted)"}>
               <span>🏠</span><span>Back to Home</span>
             </a>
             <div className="sidebar-user" onClick={async()=>{if(window.confirm("Sign out?"))await supabase.auth.signOut();}}>
