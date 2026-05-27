@@ -39,3 +39,8 @@ https://github.com/raejohnacarandang/scopelock
 
 Live Demo
 https://raejohnacarandang.github.io/scopelock/
+
+
+<img width="1346" height="673" alt="Screenshot_27-5-2026_131943_raejohnacarandang github io" src="https://github.com/user-attachments/assets/754ced5a-7d01-4f0a-ad10-4b1496b43258" />
+<img width="1345" height="768" alt="Screenshot_27-5-2026_13232_raejohnacarandang github io" src="https://github.com/user-attachments/assets/5cf20522-34bc-46ca-b7ca-94d6949def02" />
+<img width="1349" height="1206" alt="Screenshot_27-5-2026_132344_raejohnacarandang github io" src="https://github.com/user-attachments/assets/d33b0f9f-abeb-44b5-9a91-f8673f8c723c" />
